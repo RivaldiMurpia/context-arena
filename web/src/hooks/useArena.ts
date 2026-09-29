@@ -50,8 +50,65 @@ export function useArena(): ArenaState {
 
   const lastBlock = useRef<bigint>(0n);
   const bootedRound = useRef<bigint | null>(null);
+  const paintedRound = useRef<bigint | null>(null);
   const busy = useRef(false);
   const tradeCount = useRef(0);
+
+  /** Merge freshly scanned events into state (dedupe by timestamp/key). */
+  const mergeEvents = useCallback(
+    (prices: PricePoint[], feed: FeedItem[], reset: boolean) => {
+      if (reset) {
+        tradeCount.current = feed.filter((f) => f.kind === "trade").length;
+        setState((s) => ({
+          ...s,
+          priceHistory: prices,
+          feed: feed.slice(0, FEED_CAP),
+          roundTrades: tradeCount.current,
+        }));
+        return;
+      }
+      if (prices.length || feed.length) {
+        tradeCount.current += feed.filter((f) => f.kind === "trade").length;
+        const tc = tradeCount.current;
+        setState((s) => {
+          const merged = [...s.priceHistory, ...prices].sort(
+            (x, y) => x.t - y.t
+          );
+          const dedup = merged.filter(
+            (p, i) => i === 0 || merged[i - 1].t !== p.t
+          );
+          const seen = new Set(s.feed.map((f) => f.key));
+          const fresh = feed.filter((f) => !seen.has(f.key));
+          return {
+            ...s,
+            priceHistory: dedup.slice(-400),
+            feed: [...fresh, ...s.feed].slice(0, FEED_CAP),
+            roundTrades: tc,
+          };
+        });
+      }
+    },
+    []
+  );
+
+  /**
+   * Full event scan for a round — slow (many getLogs), runs in the
+   * background so first paint isn't blocked. Retried next tick on failure.
+   */
+  const loadEvents = useCallback(
+    async (rid: bigint, latest: bigint) => {
+      try {
+        const startBlock = await findRoundStartBlock(rid, latest);
+        const { prices, feed } = await scanEvents(startBlock, latest);
+        if (paintedRound.current !== rid) return; // round moved on; drop it
+        lastBlock.current = latest;
+        mergeEvents(prices, feed, true);
+      } catch {
+        bootedRound.current = null; // retry the full flow next tick
+      }
+    },
+    [mergeEvents]
+  );
 
   const tick = useCallback(async () => {
     if (busy.current) return;
@@ -72,55 +129,13 @@ export function useArena(): ArenaState {
 
       const rid = b.roundCount - 1n; // latest round (active or just settled)
 
-      // (re)seed when the round changes
-      if (bootedRound.current !== rid) {
-        bootedRound.current = rid;
-        const startBlock = await findRoundStartBlock(rid, b.blockNumber);
-        const { prices, feed } = await scanEvents(startBlock, b.blockNumber);
-        lastBlock.current = b.blockNumber;
-        tradeCount.current = feed.filter((f) => f.kind === "trade").length;
-        setState((s) => ({
-          ...s,
-          priceHistory: prices,
-          feed: feed.slice(0, FEED_CAP),
-          roundTrades: tradeCount.current,
-        }));
-      } else if (b.blockNumber > lastBlock.current) {
-        const { prices, feed } = await scanEvents(
-          lastBlock.current + 1n,
-          b.blockNumber
-        );
-        lastBlock.current = b.blockNumber;
-        if (prices.length || feed.length) {
-          tradeCount.current += feed.filter((f) => f.kind === "trade").length;
-          const tc = tradeCount.current;
-          setState((s) => {
-            const merged = [...s.priceHistory, ...prices].sort(
-              (x, y) => x.t - y.t
-            );
-            // dedupe by timestamp
-            const dedup = merged.filter(
-              (p, i) => i === 0 || merged[i - 1].t !== p.t
-            );
-            const seen = new Set(s.feed.map((f) => f.key));
-            const fresh = feed.filter((f) => !seen.has(f.key));
-            return {
-              ...s,
-              priceHistory: dedup.slice(-400),
-              feed: [...fresh, ...s.feed].slice(0, FEED_CAP),
-              roundTrades: tc,
-            };
-          });
-        }
-      }
-
+      // Fast phase: cheap eth_calls only — paint the dashboard immediately.
       const [round, ...agentStates] = await Promise.all([
         readRound(rid),
         ...AGENTS.map((a) => readAgent(rid, a.id, b.price)),
       ]);
 
-      setState((s) => {
-        // append a live price point (chart keeps breathing between events)
+      const paint = (s: ArenaState): ArenaState => {
         const last = s.priceHistory[s.priceHistory.length - 1];
         const nowTs = Math.floor(Date.now() / 1000);
         let priceHistory = s.priceHistory;
@@ -139,17 +154,43 @@ export function useArena(): ArenaState {
           agents: agentStates,
           roundCount: b.roundCount,
         };
-      });
+      };
+
+      if (bootedRound.current !== rid) {
+        // New round: paint fast, scan events in the background.
+        bootedRound.current = rid;
+        paintedRound.current = rid;
+        lastBlock.current = 0n;
+        tradeCount.current = 0;
+        setState((s) => ({
+          ...paint(s),
+          priceHistory: [],
+          feed: [],
+          roundTrades: 0,
+        }));
+        void loadEvents(rid, b.blockNumber);
+      } else {
+        // Incremental scan (small range — cheap).
+        if (lastBlock.current > 0n && b.blockNumber > lastBlock.current) {
+          const { prices, feed } = await scanEvents(
+            lastBlock.current + 1n,
+            b.blockNumber
+          );
+          lastBlock.current = b.blockNumber;
+          mergeEvents(prices, feed, false);
+        }
+        setState(paint);
+      }
     } catch (e) {
       setState((s) => ({
         ...s,
-        status: s.priceHistory.length ? "live" : "error",
+        status: s.priceHistory.length || s.roundId !== null ? "live" : "error",
         error: e instanceof Error ? e.message : "RPC unreachable",
       }));
     } finally {
       busy.current = false;
     }
-  }, []);
+  }, [loadEvents, mergeEvents]);
 
   useEffect(() => {
     tick();
