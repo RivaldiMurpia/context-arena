@@ -11,8 +11,11 @@ import rawAbi from "./abi.json";
 
 export const ABI = rawAbi as Abi;
 
-/** RPC endpoints in priority order — first responsive one wins. */
+/** RPC endpoints in priority order — first responsive one wins.
+ * /api/rpc is same-origin (works on any viewer network), the rest are
+ * direct fallbacks if the proxy itself is ever down. */
 export const RPC_URLS = [
+  "/api/rpc",
   "https://monad-testnet.api.onfinality.io/public",
   "https://testnet-rpc.monad.xyz",
 ];
