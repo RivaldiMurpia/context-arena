@@ -41,7 +41,6 @@ contract ContextArena {
     uint256 public currentPrice; // MON per CTX, 1e18 scale
     uint256 public roundCount;
     uint256 public agentCount;
-    uint256 public treasury; // MON deposited by owner to fund agent capital
 
     mapping(uint256 => Agent) public agents;
     mapping(uint256 => Round) public rounds;
@@ -71,7 +70,6 @@ contract ContextArena {
     event BetPlaced(uint256 indexed roundId, address indexed bettor, uint256 indexed agentId, uint256 amount);
     event RoundSettled(uint256 indexed roundId, uint256 indexed winnerAgentId, uint256 endPrice, bool refundMode);
     event Claimed(uint256 indexed roundId, address indexed bettor, uint256 amount);
-    event TreasuryFunded(address indexed from, uint256 amount);
     event GameMasterSet(address indexed newGameMaster);
 
     modifier onlyOwner() {
@@ -105,11 +103,6 @@ contract ContextArena {
         emit GameMasterSet(_gm);
     }
 
-    function fundTreasury() external payable onlyOwner {
-        treasury += msg.value;
-        emit TreasuryFunded(msg.sender, msg.value);
-    }
-
     function registerAgent(string calldata name, address wallet) external onlyOwner returns (uint256 agentId) {
         require(wallet != address(0), "zero address");
         agentId = agentCount++;
@@ -138,9 +131,8 @@ contract ContextArena {
             if (agents[i].active) active++;
         }
         require(active > 0, "no agents");
-        uint256 cost = active * ROUND_CAPITAL;
-        require(treasury >= cost, "treasury empty");
-        treasury -= cost;
+        // Note: agent capital is virtual (internal ledger, no real MON moves).
+        // Only real money in the contract is the spectators' bet pool.
 
         roundId = roundCount++;
         Round storage r = rounds[roundId];

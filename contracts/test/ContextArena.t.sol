@@ -20,8 +20,6 @@ contract ContextArenaTest is Test {
         vm.deal(bettor, 100 ether);
 
         vm.prank(owner);
-        arena.fundTreasury{value: 1000 ether}();
-        vm.prank(owner);
         arena.registerAgent("Degen Dan", agent0);
         vm.prank(owner);
         arena.registerAgent("Professor", agent1);
