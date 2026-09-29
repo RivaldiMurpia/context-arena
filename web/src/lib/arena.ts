@@ -1,5 +1,6 @@
 import {
   createPublicClient,
+  fallback,
   http,
   type Abi,
   type AbiEvent,
@@ -10,13 +11,20 @@ import rawAbi from "./abi.json";
 
 export const ABI = rawAbi as Abi;
 
+/** RPC endpoints in priority order — first responsive one wins. */
+export const RPC_URLS = [
+  "https://monad-testnet.api.onfinality.io/public",
+  "https://testnet-rpc.monad.xyz",
+];
+
+export const rpcTransport = fallback(
+  RPC_URLS.map((url) => http(url, { batch: true })),
+  { retryCount: 2, retryDelay: 500 }
+);
+
 export const publicClient = createPublicClient({
   chain: monadTestnet,
-  transport: http("https://testnet-rpc.monad.xyz", {
-    batch: true,
-    retryCount: 5,
-    retryDelay: 300,
-  }),
+  transport: rpcTransport,
 });
 
 // The public Monad RPC caps at ~15 req/s (it counts requests inside batches
