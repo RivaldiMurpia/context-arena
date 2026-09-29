@@ -6,6 +6,8 @@ import { NextRequest, NextResponse } from "next/server";
 // Vercel's servers, which have reliable egress, with upstream failover.
 const UPSTREAMS = [
   "https://monad-testnet.api.onfinality.io/public",
+  "https://rpc.ankr.com/monad_testnet",
+  "https://monad-testnet.drpc.org",
   "https://testnet-rpc.monad.xyz",
 ];
 
@@ -61,7 +63,7 @@ export async function POST(req: NextRequest) {
   for (const url of UPSTREAMS) {
     try {
       const ctl = new AbortController();
-      const to = setTimeout(() => ctl.abort(), 12_000);
+      const to = setTimeout(() => ctl.abort(), 8_000);
       try {
         const r = await fetch(url, {
           method: "POST",
@@ -70,6 +72,16 @@ export async function POST(req: NextRequest) {
           signal: ctl.signal,
         });
         const text = await r.text();
+        if (!r.ok) {
+          lastErr = `http ${r.status}`;
+          continue; // try next upstream
+        }
+        // JSON-RPC error bodies (e.g. shared-endpoint rate limits) should
+        // fail over too — except execution reverts, which are deterministic.
+        if (isRetryableRpcError(text)) {
+          lastErr = "retryable rpc error";
+          continue;
+        }
         return new NextResponse(text, {
           status: r.status,
           headers: { "content-type": "application/json" },
@@ -85,4 +97,28 @@ export async function POST(req: NextRequest) {
     { error: `upstream unreachable: ${lastErr}` },
     { status: 502 }
   );
+}
+
+/** True when a JSON-RPC response body carries an error worth failing over on. */
+function isRetryableRpcError(text: string): boolean {
+  let j: unknown;
+  try {
+    j = JSON.parse(text);
+  } catch {
+    return true; // not JSON at all — don't trust it
+  }
+  const items = Array.isArray(j) ? j : [j];
+  for (const it of items) {
+    const err =
+      it && typeof it === "object"
+        ? (it as { error?: { message?: unknown } }).error
+        : undefined;
+    if (err) {
+      const msg = String(err.message ?? "").toLowerCase();
+      // Execution reverts are deterministic — no point failing over.
+      if (msg.includes("revert")) return false;
+      return true;
+    }
+  }
+  return false;
 }
