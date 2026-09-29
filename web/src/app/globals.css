@@ -1,26 +1,74 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-void: #090c09;
+  --color-obsidian: #0e120e;
+  --color-panel: #131813;
+  --color-elev: #1a211a;
+  --color-acid: #a3e635;
+  --color-acid-dim: #4d7c0f;
+  --color-blood: #fb7185;
+  --color-bone: #e9eee7;
+  --color-ash: #98a196;
+  --color-faint: #5c665c;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--color-void);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-void);
+  color: var(--color-bone);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.tnum {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.hairline {
+  border-color: rgb(255 255 255 / 0.12);
+}
+
+.hairline-acid {
+  border-color: rgb(163 230 53 / 0.16);
+}
+
+/* thin scrollbars for feed panels */
+.slim-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.slim-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.slim-scroll::-webkit-scrollbar-thumb {
+  background: rgb(255 255 255 / 0.12);
+  border-radius: 3px;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.live-dot {
+  animation: pulse-dot 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-dot {
+    animation: none;
+  }
 }

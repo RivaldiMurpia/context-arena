@@ -1,0 +1,731 @@
+[
+ {
+  "type": "constructor",
+  "inputs": [],
+  "stateMutability": "nonpayable"
+ },
+ {
+  "type": "function",
+  "name": "ROUND_CAPITAL",
+  "inputs": [],
+  "outputs": [
+   {
+    "name": "",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "stateMutability": "view"
+ },
+ {
+  "type": "function",
+  "name": "SCALE",
+  "inputs": [],
+  "outputs": [
+   {
+    "name": "",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "stateMutability": "view"
+ },
+ {
+  "type": "function",
+  "name": "activeRound",
+  "inputs": [],
+  "outputs": [
+   {
+    "name": "",
+    "type": "bool",
+    "internalType": "bool"
+   }
+  ],
+  "stateMutability": "view"
+ },
+ {
+  "type": "function",
+  "name": "agentBuy",
+  "inputs": [
+   {
+    "name": "agentId",
+    "type": "uint256",
+    "internalType": "uint256"
+   },
+   {
+    "name": "monAmount",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "outputs": [],
+  "stateMutability": "nonpayable"
+ },
+ {
+  "type": "function",
+  "name": "agentCount",
+  "inputs": [],
+  "outputs": [
+   {
+    "name": "",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "stateMutability": "view"
+ },
+ {
+  "type": "function",
+  "name": "agentSell",
+  "inputs": [
+   {
+    "name": "agentId",
+    "type": "uint256",
+    "internalType": "uint256"
+   },
+   {
+    "name": "ctxAmount",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "outputs": [],
+  "stateMutability": "nonpayable"
+ },
+ {
+  "type": "function",
+  "name": "agents",
+  "inputs": [
+   {
+    "name": "",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "outputs": [
+   {
+    "name": "name",
+    "type": "string",
+    "internalType": "string"
+   },
+   {
+    "name": "wallet",
+    "type": "address",
+    "internalType": "address"
+   },
+   {
+    "name": "active",
+    "type": "bool",
+    "internalType": "bool"
+   }
+  ],
+  "stateMutability": "view"
+ },
+ {
+  "type": "function",
+  "name": "betOf",
+  "inputs": [
+   {
+    "name": "",
+    "type": "uint256",
+    "internalType": "uint256"
+   },
+   {
+    "name": "",
+    "type": "address",
+    "internalType": "address"
+   },
+   {
+    "name": "",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "outputs": [
+   {
+    "name": "",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "stateMutability": "view"
+ },
+ {
+  "type": "function",
+  "name": "betsOn",
+  "inputs": [
+   {
+    "name": "",
+    "type": "uint256",
+    "internalType": "uint256"
+   },
+   {
+    "name": "",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "outputs": [
+   {
+    "name": "",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "stateMutability": "view"
+ },
+ {
+  "type": "function",
+  "name": "claim",
+  "inputs": [
+   {
+    "name": "roundId",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "outputs": [],
+  "stateMutability": "nonpayable"
+ },
+ {
+  "type": "function",
+  "name": "claimed",
+  "inputs": [
+   {
+    "name": "",
+    "type": "uint256",
+    "internalType": "uint256"
+   },
+   {
+    "name": "",
+    "type": "address",
+    "internalType": "address"
+   }
+  ],
+  "outputs": [
+   {
+    "name": "",
+    "type": "bool",
+    "internalType": "bool"
+   }
+  ],
+  "stateMutability": "view"
+ },
+ {
+  "type": "function",
+  "name": "currentPrice",
+  "inputs": [],
+  "outputs": [
+   {
+    "name": "",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "stateMutability": "view"
+ },
+ {
+  "type": "function",
+  "name": "emergencyWithdraw",
+  "inputs": [
+   {
+    "name": "amount",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "outputs": [],
+  "stateMutability": "nonpayable"
+ },
+ {
+  "type": "function",
+  "name": "gameMaster",
+  "inputs": [],
+  "outputs": [
+   {
+    "name": "",
+    "type": "address",
+    "internalType": "address"
+   }
+  ],
+  "stateMutability": "view"
+ },
+ {
+  "type": "function",
+  "name": "owner",
+  "inputs": [],
+  "outputs": [
+   {
+    "name": "",
+    "type": "address",
+    "internalType": "address"
+   }
+  ],
+  "stateMutability": "view"
+ },
+ {
+  "type": "function",
+  "name": "placeBet",
+  "inputs": [
+   {
+    "name": "agentId",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "outputs": [],
+  "stateMutability": "payable"
+ },
+ {
+  "type": "function",
+  "name": "portfolioValue",
+  "inputs": [
+   {
+    "name": "roundId",
+    "type": "uint256",
+    "internalType": "uint256"
+   },
+   {
+    "name": "agentId",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "outputs": [
+   {
+    "name": "",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "stateMutability": "view"
+ },
+ {
+  "type": "function",
+  "name": "positions",
+  "inputs": [
+   {
+    "name": "",
+    "type": "uint256",
+    "internalType": "uint256"
+   },
+   {
+    "name": "",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "outputs": [
+   {
+    "name": "cash",
+    "type": "uint256",
+    "internalType": "uint256"
+   },
+   {
+    "name": "holdings",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "stateMutability": "view"
+ },
+ {
+  "type": "function",
+  "name": "pushPrice",
+  "inputs": [
+   {
+    "name": "newPrice",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "outputs": [],
+  "stateMutability": "nonpayable"
+ },
+ {
+  "type": "function",
+  "name": "registerAgent",
+  "inputs": [
+   {
+    "name": "name",
+    "type": "string",
+    "internalType": "string"
+   },
+   {
+    "name": "wallet",
+    "type": "address",
+    "internalType": "address"
+   }
+  ],
+  "outputs": [
+   {
+    "name": "agentId",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "stateMutability": "nonpayable"
+ },
+ {
+  "type": "function",
+  "name": "roundCount",
+  "inputs": [],
+  "outputs": [
+   {
+    "name": "",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "stateMutability": "view"
+ },
+ {
+  "type": "function",
+  "name": "rounds",
+  "inputs": [
+   {
+    "name": "",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "outputs": [
+   {
+    "name": "id",
+    "type": "uint256",
+    "internalType": "uint256"
+   },
+   {
+    "name": "startTime",
+    "type": "uint256",
+    "internalType": "uint256"
+   },
+   {
+    "name": "endTime",
+    "type": "uint256",
+    "internalType": "uint256"
+   },
+   {
+    "name": "bettingCloseTime",
+    "type": "uint256",
+    "internalType": "uint256"
+   },
+   {
+    "name": "startPrice",
+    "type": "uint256",
+    "internalType": "uint256"
+   },
+   {
+    "name": "endPrice",
+    "type": "uint256",
+    "internalType": "uint256"
+   },
+   {
+    "name": "settled",
+    "type": "bool",
+    "internalType": "bool"
+   },
+   {
+    "name": "refundMode",
+    "type": "bool",
+    "internalType": "bool"
+   },
+   {
+    "name": "winnerAgentId",
+    "type": "uint256",
+    "internalType": "uint256"
+   },
+   {
+    "name": "betPool",
+    "type": "uint256",
+    "internalType": "uint256"
+   },
+   {
+    "name": "winningBets",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "stateMutability": "view"
+ },
+ {
+  "type": "function",
+  "name": "setAgentActive",
+  "inputs": [
+   {
+    "name": "agentId",
+    "type": "uint256",
+    "internalType": "uint256"
+   },
+   {
+    "name": "active",
+    "type": "bool",
+    "internalType": "bool"
+   }
+  ],
+  "outputs": [],
+  "stateMutability": "nonpayable"
+ },
+ {
+  "type": "function",
+  "name": "setGameMaster",
+  "inputs": [
+   {
+    "name": "_gm",
+    "type": "address",
+    "internalType": "address"
+   }
+  ],
+  "outputs": [],
+  "stateMutability": "nonpayable"
+ },
+ {
+  "type": "function",
+  "name": "settleRound",
+  "inputs": [
+   {
+    "name": "roundId",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "outputs": [],
+  "stateMutability": "nonpayable"
+ },
+ {
+  "type": "function",
+  "name": "startRound",
+  "inputs": [
+   {
+    "name": "duration",
+    "type": "uint256",
+    "internalType": "uint256"
+   },
+   {
+    "name": "bettingWindow",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "outputs": [
+   {
+    "name": "roundId",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "stateMutability": "nonpayable"
+ },
+ {
+  "type": "event",
+  "name": "AgentRegistered",
+  "inputs": [
+   {
+    "name": "agentId",
+    "type": "uint256",
+    "indexed": true,
+    "internalType": "uint256"
+   },
+   {
+    "name": "name",
+    "type": "string",
+    "indexed": false,
+    "internalType": "string"
+   },
+   {
+    "name": "wallet",
+    "type": "address",
+    "indexed": false,
+    "internalType": "address"
+   }
+  ],
+  "anonymous": false
+ },
+ {
+  "type": "event",
+  "name": "AgentTrade",
+  "inputs": [
+   {
+    "name": "roundId",
+    "type": "uint256",
+    "indexed": true,
+    "internalType": "uint256"
+   },
+   {
+    "name": "agentId",
+    "type": "uint256",
+    "indexed": true,
+    "internalType": "uint256"
+   },
+   {
+    "name": "isBuy",
+    "type": "bool",
+    "indexed": false,
+    "internalType": "bool"
+   },
+   {
+    "name": "amountIn",
+    "type": "uint256",
+    "indexed": false,
+    "internalType": "uint256"
+   },
+   {
+    "name": "amountOut",
+    "type": "uint256",
+    "indexed": false,
+    "internalType": "uint256"
+   },
+   {
+    "name": "price",
+    "type": "uint256",
+    "indexed": false,
+    "internalType": "uint256"
+   }
+  ],
+  "anonymous": false
+ },
+ {
+  "type": "event",
+  "name": "BetPlaced",
+  "inputs": [
+   {
+    "name": "roundId",
+    "type": "uint256",
+    "indexed": true,
+    "internalType": "uint256"
+   },
+   {
+    "name": "bettor",
+    "type": "address",
+    "indexed": true,
+    "internalType": "address"
+   },
+   {
+    "name": "agentId",
+    "type": "uint256",
+    "indexed": true,
+    "internalType": "uint256"
+   },
+   {
+    "name": "amount",
+    "type": "uint256",
+    "indexed": false,
+    "internalType": "uint256"
+   }
+  ],
+  "anonymous": false
+ },
+ {
+  "type": "event",
+  "name": "Claimed",
+  "inputs": [
+   {
+    "name": "roundId",
+    "type": "uint256",
+    "indexed": true,
+    "internalType": "uint256"
+   },
+   {
+    "name": "bettor",
+    "type": "address",
+    "indexed": true,
+    "internalType": "address"
+   },
+   {
+    "name": "amount",
+    "type": "uint256",
+    "indexed": false,
+    "internalType": "uint256"
+   }
+  ],
+  "anonymous": false
+ },
+ {
+  "type": "event",
+  "name": "GameMasterSet",
+  "inputs": [
+   {
+    "name": "newGameMaster",
+    "type": "address",
+    "indexed": true,
+    "internalType": "address"
+   }
+  ],
+  "anonymous": false
+ },
+ {
+  "type": "event",
+  "name": "PriceUpdated",
+  "inputs": [
+   {
+    "name": "roundId",
+    "type": "uint256",
+    "indexed": true,
+    "internalType": "uint256"
+   },
+   {
+    "name": "price",
+    "type": "uint256",
+    "indexed": false,
+    "internalType": "uint256"
+   }
+  ],
+  "anonymous": false
+ },
+ {
+  "type": "event",
+  "name": "RoundSettled",
+  "inputs": [
+   {
+    "name": "roundId",
+    "type": "uint256",
+    "indexed": true,
+    "internalType": "uint256"
+   },
+   {
+    "name": "winnerAgentId",
+    "type": "uint256",
+    "indexed": true,
+    "internalType": "uint256"
+   },
+   {
+    "name": "endPrice",
+    "type": "uint256",
+    "indexed": false,
+    "internalType": "uint256"
+   },
+   {
+    "name": "refundMode",
+    "type": "bool",
+    "indexed": false,
+    "internalType": "bool"
+   }
+  ],
+  "anonymous": false
+ },
+ {
+  "type": "event",
+  "name": "RoundStarted",
+  "inputs": [
+   {
+    "name": "roundId",
+    "type": "uint256",
+    "indexed": true,
+    "internalType": "uint256"
+   },
+   {
+    "name": "endTime",
+    "type": "uint256",
+    "indexed": false,
+    "internalType": "uint256"
+   },
+   {
+    "name": "startPrice",
+    "type": "uint256",
+    "indexed": false,
+    "internalType": "uint256"
+   }
+  ],
+  "anonymous": false
+ }
+]
