@@ -1,11 +1,19 @@
 import "dotenv/config";
-import { ARENA_ABI, ARENA_ADDRESS, TIMING, publicClient, sleep, walletClientFromKey } from "./config.js";
+import {
+  ARENA_ABI,
+  TIMING,
+  arenaAddress,
+  fromWad,
+  publicClient,
+  sleep,
+  toWad,
+  walletClientFromKey,
+} from "./config.js";
 
 /**
- * Game master bot:
- *  - starts rounds, pushes the CTX price every tick (random walk + drama shocks),
- *  - settles finished rounds.
- * Run: npm run master
+ * Game master bot: starts rounds, pushes the CTX price every tick
+ * (random walk + drama shocks), settles finished rounds.
+ * Run: npm run master   (needs GAME_MASTER_KEY + ARENA_ADDRESS in .env)
  */
 
 // Box-Muller gaussian
@@ -22,32 +30,79 @@ function nextPrice(current: number): number {
   return Math.max(0.01, current * (1 + r));
 }
 
-const toWad = (x: number) => BigInt(Math.round(x * 1e18));
-
 async function main() {
-  if (!process.env.GAME_MASTER_KEY) throw new Error("GAME_MASTER_KEY missing");
+  if (!process.env.GAME_MASTER_KEY) throw new Error("GAME_MASTER_KEY missing in bots/.env");
+  const arena = arenaAddress();
   const pub = publicClient();
   const wallet = walletClientFromKey(process.env.GAME_MASTER_KEY);
-  console.log(`game master ${wallet.account?.address} | demo=${process.env.DEMO_MODE}`);
+  const me = wallet.account?.address;
+  if (!me) throw new Error("bad GAME_MASTER_KEY");
+  console.log(`game master ${me} | arena ${arena} | demo=${process.env.DEMO_MODE === "true"}`);
 
-  let price = 1.0; // MON per CTX, matches contract genesis
+  const DURATION = BigInt(TIMING.roundDuration);
+  const BET_WINDOW = BigInt(TIMING.bettingWindow);
+  let price = 1.0;
+
+  async function startRound() {
+    const cp = (await pub.readContract({
+      address: arena, abi: ARENA_ABI, functionName: "currentPrice",
+    })) as bigint;
+    price = fromWad(cp);
+    console.log(`starting new round @ price ${price.toFixed(4)}...`);
+    const h = await wallet.writeContract({
+      address: arena, abi: ARENA_ABI, functionName: "startRound",
+      args: [DURATION, BET_WINDOW], type: "legacy",
+    });
+    await pub.waitForTransactionReceipt({ hash: h });
+    console.log(`round started: ${h}`);
+  }
 
   for (;;) {
-    // TODO: replace with real contract reads/writes once ARENA_ABI is filled
-    // const active = await pub.readContract({ address: ARENA_ADDRESS, abi: ARENA_ABI, functionName: "activeRound" });
-    // if (!active) {
-    //   await wallet.writeContract({ address: ARENA_ADDRESS, abi: ARENA_ABI, functionName: "startRound",
-    //     args: [BigInt(TIMING.roundDuration), BigInt(TIMING.bettingWindow)], type: "legacy" });
-    //   console.log("round started");
-    // }
-    // price = nextPrice(price);
-    // await wallet.writeContract({ address: ARENA_ADDRESS, abi: ARENA_ABI, functionName: "pushPrice",
-    //   args: [toWad(price)], type: "legacy" });
-    // ... check endTime -> settleRound
-    console.log(`[skeleton] tick price=${price.toFixed(4)}`);
-    price = nextPrice(price);
+    try {
+      const roundCount = (await pub.readContract({
+        address: arena, abi: ARENA_ABI, functionName: "roundCount",
+      })) as bigint;
+
+      if (roundCount === 0n) {
+        await startRound();
+      } else {
+        const rid = roundCount - 1n;
+        const r = (await pub.readContract({
+          address: arena, abi: ARENA_ABI, functionName: "rounds", args: [rid],
+        })) as unknown[];
+        const settled = r[6] as boolean;
+        const endTime = r[2] as bigint;
+
+        if (!settled) {
+          const now = BigInt(Math.floor(Date.now() / 1000));
+          if (now >= endTime) {
+            console.log(`round ${rid} ended, settling...`);
+            const h = await wallet.writeContract({
+              address: arena, abi: ARENA_ABI, functionName: "settleRound",
+              args: [rid], type: "legacy",
+            });
+            await pub.waitForTransactionReceipt({ hash: h });
+            console.log(`round ${rid} settled: ${h}`);
+          } else {
+            price = nextPrice(price);
+            const h = await wallet.writeContract({
+              address: arena, abi: ARENA_ABI, functionName: "pushPrice",
+              args: [toWad(price)], type: "legacy",
+            });
+            console.log(`round ${rid} | CTX = ${price.toFixed(4)} MON (${h.slice(0, 10)}...)`);
+          }
+        } else {
+          await startRound();
+        }
+      }
+    } catch (e) {
+      console.error("tick failed:", (e as Error).message?.slice(0, 160));
+    }
     await sleep(TIMING.priceTickMs);
   }
 }
 
-main().catch((e) => { console.error(e); process.exit(1); });
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
