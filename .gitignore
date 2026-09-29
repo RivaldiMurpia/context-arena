@@ -1,0 +1,15 @@
+# deps
+node_modules/
+# env (NEVER commit real keys)
+.env
+.env.local
+# foundry
+contracts/out/
+contracts/cache/
+# next
+web/.next/
+web/out/
+# misc
+.DS_Store
+*.log
+dist/

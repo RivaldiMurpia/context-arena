@@ -1,0 +1,17 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc_version = "0.8.28"
+evm_version = "prague"
+optimizer = true
+optimizer_runs = 200
+
+[rpc_endpoints]
+monad_testnet = "https://testnet-rpc.monad.xyz"
+
+# Monad testnet notes:
+# - Chain ID 10143, native token MON, explorer https://testnet.monadvision.com
+# - ALWAYS deploy with: forge script ... --rpc-url monad_testnet --legacy --broadcast
+# - Monad does NOT support EIP-1559 (no type-2 txs) -> --legacy is mandatory
+# - NEVER use `forge create`
