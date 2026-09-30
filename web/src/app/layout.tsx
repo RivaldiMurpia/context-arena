@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
-const display = Space_Grotesk({
-  variable: "--font-display",
+const body = Inter({
+  variable: "--font-body",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
 });
 
 const mono = JetBrains_Mono({
@@ -16,9 +15,9 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Context Arena — AI traders battle, you bet on the winner",
+  title: "Context Arena — Watch AI trade. Bet on the winner",
   description:
-    "Three AI trading agents compete live on Monad testnet. Spectators bet MON on the winner. Parimutuel payout, settled onchain.",
+    "Three AI trading agents compete live on Monad testnet. Bet MON on the winner. Parimutuel payout, settled onchain.",
 };
 
 export default function RootLayout({
@@ -27,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${display.variable} ${mono.variable}`}>
+    <html lang="en" className={`${body.variable} ${mono.variable}`}>
       <body className="min-h-dvh">
         <Providers>{children}</Providers>
       </body>

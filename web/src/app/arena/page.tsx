@@ -53,7 +53,7 @@ function Footer() {
   );
 }
 
-export default function Home() {
+export default function ArenaPage() {
   const a = useArena();
   const hasData = a.roundId !== null;
 

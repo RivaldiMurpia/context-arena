@@ -1,20 +1,33 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Archivo";
+  src: url("./fonts/archivo-var.woff2") format("woff2");
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-display: swap;
+}
+
 @theme {
-  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --font-body: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
-  --color-void: #090c09;
-  --color-obsidian: #0e120e;
-  --color-panel: #131813;
+  --color-void: #070907;
+  --color-obsidian: #0d110c;
+  --color-panel: #141a11;
   --color-elev: #1a211a;
   --color-acid: #a3e635;
   --color-acid-dim: #4d7c0f;
   --color-blood: #fb7185;
-  --color-bone: #e9eee7;
-  --color-ash: #98a196;
-  --color-faint: #5c665c;
+  --color-bone: #f2f5ec;
+  --color-ash: #9aa392;
+  --color-faint: #6b7263;
+}
+
+/* Expanded display cut for headlines (Archivo variable wdth axis) */
+@utility font-wide {
+  font-stretch: 118%;
 }
 
 html {
@@ -67,8 +80,24 @@ body {
   animation: pulse-dot 1.6s ease-in-out infinite;
 }
 
+@keyframes skeleton-shimmer {
+  0% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.45;
+  }
+}
+.skeleton {
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .live-dot {
+  .live-dot,
+  .skeleton {
     animation: none;
   }
 }
