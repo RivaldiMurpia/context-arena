@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { QrCode, Browser, X } from "@phosphor-icons/react";
 import { useAccount, useConnect } from "wagmi";
-import { walletConnectEnabled } from "@/app/providers";
+import { walletConnectReady } from "@/lib/wallet";
 
 /**
  * Wallet picker: browser extension (injected) or mobile wallet via
@@ -19,7 +19,7 @@ export function WalletModal({
 }) {
   const { connect, connectors, isPending } = useConnect();
   const { isConnected } = useAccount();
-  const wcReady = walletConnectEnabled();
+  const wcReady = walletConnectReady();
 
   useEffect(() => {
     if (open && isConnected) onClose();

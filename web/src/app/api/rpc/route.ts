@@ -29,6 +29,8 @@ const ALLOW = new Set([
   "eth_getBlockByNumber",
   "eth_gasPrice",
   "eth_estimateGas",
+  "eth_getBalance",
+  "eth_getTransactionReceipt",
 ]);
 
 // Crude per-IP rate limit (per function instance).
