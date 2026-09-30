@@ -5,12 +5,19 @@ import { NextRequest, NextResponse } from "next/server";
 // per-IP rate limits). This route forwards read-only JSON-RPC calls from
 // Vercel's servers, which have reliable egress, with upstream failover,
 // retry-with-backoff on rate limits, and a short response cache.
-const UPSTREAMS = [
-  "https://monad-testnet.api.onfinality.io/public",
-  "https://rpc.ankr.com/monad_testnet",
-  "https://monad-testnet.drpc.org",
-  "https://testnet-rpc.monad.xyz",
-];
+// Upstream failover order. If ALCHEMY_RPC_URL is set (Vercel env var),
+// Alchemy goes first — higher rate limits, dedicated quota.
+function getUpstreams(): string[] {
+  const list = [
+    "https://monad-testnet.api.onfinality.io/public",
+    "https://rpc.ankr.com/monad_testnet",
+    "https://monad-testnet.drpc.org",
+    "https://testnet-rpc.monad.xyz",
+  ];
+  const alchemy = (process.env.ALCHEMY_RPC_URL || "").trim();
+  if (alchemy.startsWith("https://")) list.unshift(alchemy);
+  return list;
+}
 
 // Read-only methods the dashboard needs. No transaction submission here;
 // writes go through the user's own wallet.
@@ -104,7 +111,8 @@ export async function POST(req: NextRequest) {
   }
 
   const failures: string[] = [];
-  for (const url of UPSTREAMS) {
+  const upstreams = getUpstreams();
+  for (const url of upstreams) {
     // Retry rate-limited upstreams with backoff before failing over:
     // OnFinality is the only endpoint that serves large getLogs ranges,
     // the others just burn time when it's throttling.
