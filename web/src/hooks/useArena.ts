@@ -194,7 +194,14 @@ export function useArena(): ArenaState {
 
   useEffect(() => {
     tick();
-    const id = setInterval(tick, POLL_MS);
+    const id = setInterval(() => {
+      if (document.hidden) return; // don't burn RPC quota on hidden tabs
+      tick();
+    }, POLL_MS);
+    const onVisible = () => {
+      if (!document.hidden) tick(); // refresh immediately on return
+    };
+    document.addEventListener("visibilitychange", onVisible);
     const clock = setInterval(
       () => setState((s) => ({ ...s, now: Math.floor(Date.now() / 1000) })),
       1000
@@ -204,6 +211,7 @@ export function useArena(): ArenaState {
     return () => {
       clearInterval(id);
       clearInterval(clock);
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, [tick]);
 
