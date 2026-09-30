@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAccount, useConnect, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { injected } from "wagmi/connectors";
+import { useAccount, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { parseEther } from "viem";
 import type { AgentState, RoundInfo } from "@/lib/arena";
 import { ABI, readClaimed, readMyBets } from "@/lib/arena";
 import { AGENTS, ARENA_ADDRESS, fmtMon } from "@/lib/chain";
 import { phaseOf } from "@/hooks/useArena";
+import { WalletModal } from "./WalletModal";
 
 function odds(betsOn: bigint, pool: bigint): string {
   if (betsOn === 0n || pool === 0n) return "—";
@@ -29,7 +29,7 @@ export function BettingPanel({
   now: number;
 }) {
   const { address, isConnected } = useAccount();
-  const { connect, isPending: connectPending } = useConnect();
+  const [walletOpen, setWalletOpen] = useState(false);
   const [pick, setPick] = useState(0);
   const [amount, setAmount] = useState("1");
   const [myBets, setMyBets] = useState<bigint[]>([0n, 0n, 0n]);
@@ -171,13 +171,15 @@ export function BettingPanel({
       </div>
 
       {!isConnected ? (
-        <button
-          onClick={() => connect({ connector: injected() })}
-          disabled={connectPending}
-          className="mt-4 w-full rounded-full bg-acid py-2.5 text-[14px] font-semibold text-void transition-all hover:brightness-110 active:scale-[0.98]"
-        >
-          {connectPending ? "Connecting…" : "Connect wallet to bet"}
-        </button>
+        <>
+          <button
+            onClick={() => setWalletOpen(true)}
+            className="mt-4 w-full rounded-full bg-acid py-2.5 text-[14px] font-semibold text-void transition-all hover:brightness-110 active:scale-[0.98]"
+          >
+            Connect wallet to bet
+          </button>
+          <WalletModal open={walletOpen} onClose={() => setWalletOpen(false)} />
+        </>
       ) : (
         <button
           onClick={placeBet}

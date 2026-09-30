@@ -1,9 +1,10 @@
 "use client";
 
-import { useAccount, useConnect, useDisconnect } from "wagmi";
-import { injected } from "wagmi/connectors";
+import { useState } from "react";
+import { useAccount, useDisconnect } from "wagmi";
 import { ArrowSquareOut, Wallet } from "@phosphor-icons/react";
 import { ARENA_ADDRESS, EXPLORER_ADDR, shortAddr } from "@/lib/chain";
+import { WalletModal } from "./WalletModal";
 
 function Mark() {
   return (
@@ -16,8 +17,8 @@ function Mark() {
 
 export function Header({ roundId, live }: { roundId: bigint | null; live: boolean }) {
   const { address, isConnected } = useAccount();
-  const { connect, isPending } = useConnect();
   const { disconnect } = useDisconnect();
+  const [walletOpen, setWalletOpen] = useState(false);
 
   return (
     <header className="border-b hairline">
@@ -59,15 +60,15 @@ export function Header({ roundId, live }: { roundId: bigint | null; live: boolea
             </button>
           ) : (
             <button
-              onClick={() => connect({ connector: injected() })}
-              disabled={isPending}
+              onClick={() => setWalletOpen(true)}
               className="flex items-center gap-2 rounded-full bg-acid px-4 py-1.5 text-[12px] font-semibold text-void transition-transform hover:brightness-110 active:scale-[0.98]"
             >
               <Wallet size={14} weight="bold" />
-              {isPending ? "…" : "Connect"}
+              Connect
             </button>
           )}
         </div>
+        <WalletModal open={walletOpen} onClose={() => setWalletOpen(false)} />
       </div>
     </header>
   );
