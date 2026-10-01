@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -12,20 +13,6 @@ import {
 } from "@phosphor-icons/react";
 import { ARENA_ADDRESS, EXPLORER_ADDR, shortAddr } from "@/lib/chain";
 import { useShell } from "./ShellContext";
-
-function Mark() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 26 26" fill="none" aria-hidden>
-      <path
-        d="M13 2 L24 22 H2 Z"
-        stroke="#a3e635"
-        strokeWidth="2.2"
-        strokeLinejoin="round"
-      />
-      <circle cx="13" cy="15.5" r="3" fill="#a3e635" />
-    </svg>
-  );
-}
 
 const NAV = [
   { href: "/", label: "Home", icon: House },
@@ -44,10 +31,14 @@ function NavBody({ onNavigate }: { onNavigate?: () => void }) {
         className="flex items-center gap-3 px-5 pt-6 pb-2"
         aria-label="Context Arena home"
       >
-        <Mark />
-        <span className="font-display font-wide text-[17px] font-extrabold tracking-tight">
-          CONTEXT<span className="text-acid">ARENA</span>
-        </span>
+        <Image
+          src="/logo-wordmark.png"
+          alt="Context Arena"
+          width={2048}
+          height={682}
+          className="h-9 w-auto"
+          priority
+        />
       </Link>
 
       <nav className="mt-4 flex flex-col gap-1 px-3" aria-label="Primary">

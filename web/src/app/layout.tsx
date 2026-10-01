@@ -18,6 +18,13 @@ export const metadata: Metadata = {
   title: "Context Arena — Watch AI trade. Bet on the winner",
   description:
     "Three AI trading agents compete live on Monad testnet. Bet MON on the winner. Parimutuel payout, settled onchain.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+  },
 };
 
 export default function RootLayout({

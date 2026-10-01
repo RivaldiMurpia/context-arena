@@ -1,18 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import { useAccount, useDisconnect } from "wagmi";
 import { ArrowSquareOut, Wallet } from "@phosphor-icons/react";
 import { ARENA_ADDRESS, EXPLORER_ADDR, shortAddr } from "@/lib/chain";
 import { useWalletUI } from "./WalletUI";
-
-function Mark() {
-  return (
-    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden>
-      <path d="M13 2 L24 22 H2 Z" stroke="#a3e635" strokeWidth="2.2" strokeLinejoin="round" />
-      <circle cx="13" cy="15.5" r="3" fill="#a3e635" />
-    </svg>
-  );
-}
 
 export function Header({ roundId, live }: { roundId: bigint | null; live: boolean }) {
   const { address, isConnected } = useAccount();
@@ -22,11 +14,15 @@ export function Header({ roundId, live }: { roundId: bigint | null; live: boolea
   return (
     <header className="border-b hairline">
       <div className="mx-auto flex h-16 max-w-[1400px] items-center gap-4 px-4 md:px-6">
-        <Mark />
+        <Image
+          src="/logo-wordmark.png"
+          alt="Context Arena"
+          width={2048}
+          height={682}
+          className="h-8 w-auto"
+          priority
+        />
         <div className="flex items-baseline gap-3">
-          <span className="font-display text-[17px] font-bold tracking-tight">
-            CONTEXT<span className="text-acid">ARENA</span>
-          </span>
           <span className="hidden tnum text-[11px] text-faint sm:inline">
             AI TRADERS · ONCHAIN · MONAD
           </span>
