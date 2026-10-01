@@ -17,9 +17,9 @@ export function Header({ roundId, live }: { roundId: bigint | null; live: boolea
         <Image
           src="/logo-wordmark.png"
           alt="Context Arena"
-          width={2048}
-          height={682}
-          className="h-8 w-auto"
+          width={1869}
+          height={177}
+          className="h-auto w-[176px]"
           priority
         />
         <div className="flex items-baseline gap-3">

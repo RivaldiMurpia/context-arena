@@ -34,9 +34,9 @@ function NavBody({ onNavigate }: { onNavigate?: () => void }) {
         <Image
           src="/logo-wordmark.png"
           alt="Context Arena"
-          width={2048}
-          height={682}
-          className="h-9 w-auto"
+          width={1869}
+          height={177}
+          className="h-auto w-[200px]"
           priority
         />
       </Link>
