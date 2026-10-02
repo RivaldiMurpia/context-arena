@@ -72,17 +72,16 @@ export function ProfileModal({
   mode: "claim" | "rename";
   onClose: () => void;
 }) {
-  const { address } = useAccount();
   const { profile, generatedName, saveProfile, saving, error } = useProfile();
-  const [name, setName] = useState(
-    mode === "rename" ? (profile?.username ?? "") : ""
-  );
+  // claim mode: editable input, pre-filled with the auto-generated suggestion
+  const [name, setName] = useState<string | null>(null);
   const [localError, setLocalError] = useState<string | null>(null);
+  const shown =
+    name ?? (mode === "rename" ? (profile?.username ?? "") : (generatedName ?? ""));
 
   const submit = async () => {
     setLocalError(null);
-    const finalName =
-      mode === "claim" ? (generatedName ?? "") : name.trim();
+    const finalName = shown.trim();
     if (!isValidUsername(finalName)) {
       setLocalError("3–20 characters: letters, numbers, underscore.");
       return;
@@ -105,21 +104,31 @@ export function ProfileModal({
     >
       {mode === "claim" ? (
         <>
-          <div className="mt-4 flex items-center gap-3 rounded-xl border hairline bg-void p-3.5">
-            {address && <WalletAvatar wallet={address} size={40} />}
-            <div className="min-w-0">
-              <p className="tnum truncate font-mono text-[15px] font-semibold text-acid">
-                {generatedName ?? "…"}
-              </p>
-              <p className="tnum text-[11px] text-faint">
-                auto-generated for {address ? shortAddr(address) : ""}
-              </p>
-            </div>
-          </div>
           <p className="mt-3 text-[13px] leading-relaxed text-ash">
-            This name is yours after one free signature — no gas. You can
-            change it <span className="text-bone">exactly once</span>,
-            afterwards it&apos;s locked forever. Choose wisely on the rename.
+            We reserved{" "}
+            <span className="font-mono text-acid">{generatedName ?? "…"}</span>{" "}
+            for your wallet — keep it, or claim your own name below.
+          </p>
+          <label className="mt-4 block">
+            <span className="tnum text-[10px] tracking-[0.18em] text-faint">
+              USERNAME
+            </span>
+            <input
+              value={shown}
+              onChange={(e) => setName(e.target.value)}
+              placeholder={generatedName ?? undefined}
+              maxLength={20}
+              autoFocus
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              className="mt-1.5 h-11 w-full rounded-xl border hairline bg-void px-4 font-mono text-[14px] text-bone outline-none placeholder:text-faint focus:border-acid/60"
+            />
+          </label>
+          <p className="mt-3 text-[13px] leading-relaxed text-ash">
+            One free signature — no gas. You can change it{" "}
+            <span className="text-bone">exactly once</span> afterwards, then
+            it&apos;s locked forever.
           </p>
         </>
       ) : (
@@ -136,12 +145,15 @@ export function ProfileModal({
               NEW USERNAME
             </span>
             <input
-              value={name}
+              value={shown}
               onChange={(e) => setName(e.target.value)}
               placeholder={profile?.username}
               maxLength={20}
               autoFocus
-              className="mt-1.5 h-11 w-full rounded-xl border hairline bg-void px-4 text-[14px] text-bone outline-none placeholder:text-faint focus:border-acid/60"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              className="mt-1.5 h-11 w-full rounded-xl border hairline bg-void px-4 font-mono text-[14px] text-bone outline-none placeholder:text-faint focus:border-acid/60"
             />
           </label>
         </>
