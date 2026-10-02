@@ -8,12 +8,15 @@ import { ABI, readClaimed, readMyBets } from "@/lib/arena";
 import { AGENTS, ARENA_ADDRESS, fmtMon } from "@/lib/chain";
 import { phaseOf } from "@/hooks/useArena";
 import { useWalletUI } from "./WalletUI";
+import { AgentMark } from "./home/AgentMark";
 
 function odds(betsOn: bigint, pool: bigint): string {
   if (betsOn === 0n || pool === 0n) return "—";
   const x = Number((pool * 100n) / betsOn) / 100;
   return `${x.toFixed(2)}×`;
 }
+
+const QUICK_AMOUNTS = ["1", "5", "10"];
 
 export function BettingPanel({
   round,
@@ -104,7 +107,7 @@ export function BettingPanel({
   };
 
   return (
-    <aside className="flex flex-col border hairline bg-obsidian p-5">
+    <aside className="flex flex-col rounded-2xl border hairline bg-panel p-5">
       <h2 className="font-display text-lg font-semibold tracking-tight">
         Back a trader
       </h2>
@@ -113,23 +116,26 @@ export function BettingPanel({
         split the pool.
       </p>
 
-      <div className="mt-4 space-y-2">
+      <div className="mt-4 space-y-2" role="radiogroup" aria-label="Pick a trader">
         {AGENTS.map((a) => {
           const st = agents.find((x) => x.id === a.id);
           const selected = pick === a.id;
           return (
             <button
               key={a.id}
+              role="radio"
+              aria-checked={selected}
               onClick={() => setPick(a.id)}
               disabled={!bettingOpen}
-              className={`flex w-full items-center justify-between border px-3 py-2.5 text-left transition-all duration-150 active:scale-[0.99] ${
+              className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-all duration-150 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-acid/70 ${
                 selected
                   ? "hairline-acid bg-[rgba(163,230,53,0.06)]"
                   : "hairline hover:border-[rgba(255,255,255,0.18)]"
               } ${!bettingOpen ? "opacity-50" : ""}`}
             >
-              <span>
-                <span className="block text-[14px] font-medium text-bone">
+              <AgentMark id={a.id} size="sm" />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[14px] font-medium text-bone">
                   {a.name}
                 </span>
                 <span className="tnum block text-[11px] text-faint">
@@ -150,13 +156,32 @@ export function BettingPanel({
       </div>
 
       <div className="mt-4">
-        <label
-          htmlFor="bet-amount"
-          className="text-[10px] tracking-[0.14em] text-faint"
-        >
-          AMOUNT
-        </label>
-        <div className="mt-1.5 flex items-center border hairline bg-void px-3 focus-within:hairline-acid">
+        <div className="flex items-center justify-between">
+          <label
+            htmlFor="bet-amount"
+            className="text-[10px] tracking-[0.14em] text-faint"
+          >
+            AMOUNT
+          </label>
+          <div className="tnum flex gap-1.5">
+            {QUICK_AMOUNTS.map((q) => (
+              <button
+                key={q}
+                type="button"
+                onClick={() => setAmount(q)}
+                disabled={!bettingOpen}
+                className={`rounded-full border px-2.5 py-1 text-[11px] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-acid/70 disabled:opacity-40 ${
+                  amount === q
+                    ? "hairline-acid text-acid"
+                    : "hairline text-ash hover:text-bone"
+                }`}
+              >
+                {q}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="mt-1.5 flex items-center rounded-xl border hairline bg-void px-3 focus-within:hairline-acid">
           <input
             id="bet-amount"
             inputMode="decimal"
@@ -173,7 +198,7 @@ export function BettingPanel({
       {!isConnected ? (
         <button
           onClick={openWallet}
-          className="mt-4 w-full rounded-full bg-acid py-2.5 text-[14px] font-semibold text-void transition-all hover:brightness-110 active:scale-[0.98]"
+          className="mt-4 w-full rounded-full bg-acid py-2.5 text-[14px] font-semibold text-void transition-all hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-acid/70"
         >
           Connect wallet to bet
         </button>
@@ -181,7 +206,7 @@ export function BettingPanel({
         <button
           onClick={placeBet}
           disabled={!bettingOpen || txPending}
-          className="mt-4 w-full rounded-full bg-acid py-2.5 text-[14px] font-semibold text-void transition-all hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:brightness-100"
+          className="mt-4 w-full rounded-full bg-acid py-2.5 text-[14px] font-semibold text-void transition-all hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-acid/70 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:brightness-100"
         >
           {!bettingOpen
             ? "Betting closed"
@@ -224,7 +249,7 @@ export function BettingPanel({
         <button
           onClick={claim}
           disabled={txPending}
-          className="tnum mt-4 w-full rounded-full border hairline-acid py-2.5 text-[14px] font-semibold text-acid transition-all hover:bg-[rgba(163,230,53,0.08)] active:scale-[0.98]"
+          className="tnum mt-4 w-full rounded-full border hairline-acid py-2.5 text-[14px] font-semibold text-acid transition-all hover:bg-[rgba(163,230,53,0.08)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-acid/70"
         >
           {txPending ? "Confirm in wallet…" : `Claim ${fmtMon(claimable)} MON`}
         </button>

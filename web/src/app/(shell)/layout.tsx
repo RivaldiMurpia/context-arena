@@ -6,9 +6,8 @@ import { TopBar } from "@/components/shell/TopBar";
 import { ShellFooter } from "@/components/shell/ShellFooter";
 
 /**
- * App shell for the broadcast-style routes (/, /history): persistent
- * sidebar + top bar. /arena keeps its own standalone layout for now and
- * gets folded into the shell during the arena refinement pass.
+ * App shell for the broadcast-style routes (/, /arena, /history, /profile):
+ * persistent sidebar + top bar.
  */
 export default function ShellLayout({
   children,

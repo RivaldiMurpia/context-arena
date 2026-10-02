@@ -2,6 +2,7 @@
 
 import type { AgentState, FeedItem } from "@/lib/arena";
 import { AGENTS, fmtMon } from "@/lib/chain";
+import { AgentMark } from "./home/AgentMark";
 
 type TradeItem = Extract<FeedItem, { kind: "trade" }>;
 
@@ -39,7 +40,8 @@ function AgentRow({
       </span>
 
       <div className="min-w-0">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
+          <AgentMark id={a.id} size="sm" />
           <span className="font-display text-[16px] font-semibold tracking-tight">
             {meta.name}
           </span>

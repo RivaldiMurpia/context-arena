@@ -4,14 +4,7 @@ import { Trophy } from "@phosphor-icons/react";
 import type { RoundInfo } from "@/lib/arena";
 import { AGENTS, fmtMon } from "@/lib/chain";
 import { fmtCountdown, phaseOf } from "@/hooks/useArena";
-
-const PHASE_COPY: Record<string, { label: string; cls: string }> = {
-  betting: { label: "BETTING OPEN", cls: "bg-acid text-void" },
-  trading: { label: "TRADING", cls: "bg-elev text-bone" },
-  settling: { label: "SETTLING…", cls: "bg-elev text-ash" },
-  settled: { label: "SETTLED", cls: "bg-elev text-ash" },
-  idle: { label: "IDLE", cls: "bg-elev text-faint" },
-};
+import { PhasePill } from "./PhasePill";
 
 export function RoundPanel({
   round,
@@ -25,15 +18,12 @@ export function RoundPanel({
   now: number;
 }) {
   const phase = phaseOf(round, hasActive, now);
-  const p = PHASE_COPY[phase];
 
   return (
-    <aside className="flex flex-col border hairline bg-obsidian p-5">
+    <aside className="flex flex-col rounded-2xl border hairline bg-panel p-5">
       <div className="flex items-center justify-between">
         <span className="tnum text-[11px] tracking-[0.18em] text-faint">ROUND</span>
-        <span className={`tnum rounded-full px-2.5 py-1 text-[10px] font-semibold tracking-[0.12em] ${p.cls}`}>
-          {p.label}
-        </span>
+        <PhasePill round={round} hasActive={hasActive} now={now} />
       </div>
 
       <div className="tnum mt-2 text-5xl font-semibold tracking-tight text-bone">

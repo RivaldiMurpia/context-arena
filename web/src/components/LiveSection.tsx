@@ -35,13 +35,11 @@ export function LiveSection({
   price,
   priceHistory,
   round,
-  roundId,
   roundTrades,
 }: {
   price: bigint;
   priceHistory: PricePoint[];
   round: RoundInfo | null;
-  roundId: bigint | null;
   roundTrades: number;
 }) {
   const start = round?.startPrice ?? null;
@@ -63,9 +61,6 @@ export function LiveSection({
         <span className="tnum text-[11px] tracking-[0.18em] text-ash">
           CTX / MON — LIVE
         </span>
-        {roundId !== null && (
-          <span className="tnum text-[11px] text-faint">ROUND {roundId.toString()}</span>
-        )}
       </div>
 
       <div className="mt-3 flex flex-wrap items-end gap-x-5 gap-y-2">
