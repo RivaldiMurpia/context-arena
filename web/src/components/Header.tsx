@@ -1,16 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useAccount, useDisconnect } from "wagmi";
-import { ArrowSquareOut, Wallet } from "@phosphor-icons/react";
+import { ArrowSquareOut } from "@phosphor-icons/react";
 import { ARENA_ADDRESS, EXPLORER_ADDR, shortAddr } from "@/lib/chain";
-import { useWalletUI } from "./WalletUI";
+import { ProfileButton } from "./ProfileButton";
 
 export function Header({ roundId, live }: { roundId: bigint | null; live: boolean }) {
-  const { address, isConnected } = useAccount();
-  const { disconnect } = useDisconnect();
-  const { openWallet } = useWalletUI();
-
   return (
     <header className="border-b hairline">
       <div className="mx-auto flex h-16 max-w-[1400px] items-center gap-4 px-4 md:px-6">
@@ -44,24 +39,7 @@ export function Header({ roundId, live }: { roundId: bigint | null; live: boolea
             {shortAddr(ARENA_ADDRESS)}
             <ArrowSquareOut size={12} />
           </a>
-          {isConnected ? (
-            <button
-              onClick={() => disconnect()}
-              className="tnum flex items-center gap-2 rounded-full bg-elev px-4 py-1.5 text-[12px] text-bone transition-transform active:scale-[0.98]"
-              title={address}
-            >
-              <Wallet size={14} className="text-acid" />
-              {address ? shortAddr(address) : ""}
-            </button>
-          ) : (
-            <button
-              onClick={openWallet}
-              className="flex items-center gap-2 rounded-full bg-acid px-4 py-1.5 text-[12px] font-semibold text-void transition-transform hover:brightness-110 active:scale-[0.98]"
-            >
-              <Wallet size={14} weight="bold" />
-              Connect
-            </button>
-          )}
+          <ProfileButton />
         </div>
       </div>
     </header>

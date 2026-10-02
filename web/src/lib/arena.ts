@@ -170,7 +170,9 @@ async function getLogsChunked(
   event: AbiEvent,
   fromBlock: bigint,
   toBlock: bigint,
-  chunk = 8000n
+  chunk = 8000n,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  args?: Record<string, any>
 ): Promise<RawLog[]> {
   const out: RawLog[] = [];
   let from = fromBlock;
@@ -181,6 +183,7 @@ async function getLogsChunked(
         address: ARENA_ADDRESS,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         event: event as any,
+        args,
         fromBlock: from,
         toBlock: to,
       })) as unknown as RawLog[];
@@ -188,13 +191,55 @@ async function getLogsChunked(
     } catch {
       // shrink chunk on failure (rate limits), retry once
       if (chunk > 1000n) {
-        const half = await getLogsChunked(event, from, to, chunk / 2n);
+        const half = await getLogsChunked(event, from, to, chunk / 2n, args);
         out.push(...half);
       }
     }
     from = to + 1n;
   }
   return out;
+}
+
+/** Block timestamp lookup (cached). Exported for per-wallet history. */
+export async function blockTimestamp(blockNumber: bigint): Promise<number> {
+  return tsOf(blockNumber);
+}
+
+export interface MyBetLog {
+  roundId: bigint;
+  agentId: number;
+  amount: bigint;
+  tx: `0x${string}`;
+  blockNumber: bigint;
+}
+
+/**
+ * All BetPlaced events for one bettor in a block range, newest first.
+ * The bettor topic is indexed so the RPC filters server-side.
+ */
+export async function scanMyBetLogs(
+  bettor: `0x${string}`,
+  fromBlock: bigint,
+  toBlock: bigint
+): Promise<MyBetLog[]> {
+  const logs = await getLogsChunked(evBet, fromBlock, toBlock, 8000n, {
+    bettor,
+  });
+  return logs
+    .map((l) => ({
+      roundId: l.args.roundId as bigint,
+      agentId: Number(l.args.agentId),
+      amount: l.args.amount as bigint,
+      tx: l.transactionHash,
+      blockNumber: l.blockNumber,
+    }))
+    .sort((a, b) =>
+      a.blockNumber === b.blockNumber
+        ? 0
+        : a.blockNumber > b.blockNumber
+          ? -1
+          : 1
+    );
 }
 
 /**
