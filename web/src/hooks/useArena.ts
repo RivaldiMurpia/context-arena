@@ -104,7 +104,12 @@ export function useArena(): ArenaState {
         lastBlock.current = latest;
         mergeEvents(prices, feed, true);
       } catch {
-        bootedRound.current = null; // retry the full flow next tick
+        // Transient RPC failure: retry the scan without wiping the feed.
+        // (Resetting bootedRound here used to force a full rescan + feed
+        // reset, flashing the activity feed empty on every blip.)
+        setTimeout(() => {
+          if (paintedRound.current === rid) void loadEvents(rid, latest);
+        }, 5000);
       }
     },
     [mergeEvents]

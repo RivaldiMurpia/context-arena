@@ -30,28 +30,13 @@ export const publicClient = createPublicClient({
   transport: rpcTransport,
 });
 
-// The public Monad RPC caps at ~15 req/s (it counts requests inside batches
-// too). The dashboard fires many parallel reads, so serialize every JSON-RPC
-// call with ~90ms spacing to stay comfortably under the limit.
-let lastRpcAt = 0;
-let rpcQueue: Promise<unknown> = Promise.resolve();
-const rawRequest = publicClient.request.bind(publicClient);
-publicClient.request = (async (args: unknown, options?: unknown) => {
-  const run = rpcQueue.then(async () => {
-    const wait = 90 - (Date.now() - lastRpcAt);
-    if (wait > 0) await new Promise((r) => setTimeout(r, wait));
-    try {
-      return await (rawRequest as (...a: unknown[]) => Promise<unknown>)(
-        args,
-        options
-      );
-    } finally {
-      lastRpcAt = Date.now();
-    }
-  });
-  rpcQueue = run.catch(() => {});
-  return run;
-}) as typeof publicClient.request;
+// NOTE: an earlier version serialized every JSON-RPC call with ~90ms spacing
+// for the public Monad RPC's ~15 req/s cap. That throttle is gone on purpose:
+// it defeated viem's request batching (each call became its own HTTP request),
+// which made the background event scan take ~25s — longer than the retry
+// loop tolerated, so the activity feed never filled. Rate protection now
+// lives in /api/rpc (per-IP limit, retry-with-backoff, upstream failover,
+// response cache) in front of Alchemy's much higher quotas.
 
 const ROUND_CAPITAL = 10n ** 20n; // 100 MON
 
