@@ -55,15 +55,18 @@ export async function POST(req: NextRequest) {
     return json({ error: "bad json" }, 400);
   }
 
-  const wallet =
-    typeof body.wallet === "string" ? body.wallet.toLowerCase() : "";
+  const rawWallet = typeof body.wallet === "string" ? body.wallet : "";
   const username = typeof body.username === "string" ? body.username.trim() : "";
   const timestamp =
     typeof body.timestamp === "number" ? Math.floor(body.timestamp) : NaN;
   const signature =
     typeof body.signature === "string" ? body.signature : "";
 
-  if (!isAddress(wallet)) return json({ error: "bad wallet" }, 400);
+  // Validate the address exactly as sent: the client signs the message with
+  // this same casing (wagmi gives checksummed addresses), so the server
+  // must rebuild the message byte-identical. Only the DB key is lowercased.
+  if (!isAddress(rawWallet)) return json({ error: "bad wallet" }, 400);
+  const wallet = rawWallet.toLowerCase();
   if (!isValidUsername(username))
     return json(
       { error: "username must be 3–20 chars: letters, numbers, underscore" },
@@ -76,16 +79,17 @@ export async function POST(req: NextRequest) {
   if (!/^0x[0-9a-fA-F]+$/.test(signature))
     return json({ error: "bad signature" }, 400);
 
-  // Rebuild the exact message we expect; the signature must match it.
+  // Rebuild the exact message the client signed (original address casing);
+  // the signature is only valid for this exact text and address.
   const message = linkMessage(
     username,
-    wallet as `0x${string}`,
+    rawWallet as `0x${string}`,
     timestamp
   );
   let ok = false;
   try {
     ok = await verifyMessage({
-      address: wallet as `0x${string}`,
+      address: rawWallet as `0x${string}`,
       message,
       signature: signature as `0x${string}`,
     });
