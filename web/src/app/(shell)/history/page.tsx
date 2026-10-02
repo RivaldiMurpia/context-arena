@@ -6,7 +6,7 @@ import { useAccount } from "wagmi";
 import { Trophy, Wallet } from "@phosphor-icons/react";
 import { useHallOfFame } from "@/hooks/useHallOfFame";
 import { useMyBids } from "@/hooks/useMyBids";
-import { useProfile } from "@/hooks/useProfile";
+import { useProfile } from "@/components/ProfileProvider";
 import { useWalletUI } from "@/components/WalletUI";
 import { ProfileModal } from "@/components/ProfileButton";
 import { MyBidTable } from "@/components/MyBidTable";

@@ -16,7 +16,7 @@ import {
 import { fmtMon } from "@/lib/chain";
 import { BIO_MAX, normalizeBio } from "@/lib/supabase";
 import { useMyBids } from "@/hooks/useMyBids";
-import { useProfile } from "@/hooks/useProfile";
+import { useProfile } from "@/components/ProfileProvider";
 import { useWalletUI } from "@/components/WalletUI";
 import { ProfileModal } from "@/components/ProfileButton";
 import { WalletAvatar } from "@/components/WalletAvatar";

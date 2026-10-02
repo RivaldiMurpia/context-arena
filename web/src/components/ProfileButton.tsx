@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { createPortal } from "react-dom";
 import { useAccount, useDisconnect } from "wagmi";
 import {
@@ -13,7 +14,7 @@ import {
 } from "@phosphor-icons/react";
 import { shortAddr } from "@/lib/chain";
 import { isValidUsername } from "@/lib/supabase";
-import { useProfile } from "@/hooks/useProfile";
+import { useProfile } from "./ProfileProvider";
 import { useWalletUI } from "@/components/WalletUI";
 import { WalletAvatar } from "./WalletAvatar";
 
@@ -209,12 +210,13 @@ export function ProfileButton() {
         {loading ? (
           <span className="skeleton ml-1 h-4 w-16 rounded-md bg-white/[0.08]" />
         ) : profile ? (
-          <span
-            className="ml-1 max-w-[130px] truncate text-[13px] font-medium text-bone"
-            title={address}
+          <Link
+            href="/profile"
+            className="ml-1 max-w-[130px] truncate text-[13px] font-medium text-bone transition hover:text-acid"
+            title="View profile"
           >
             {profile.username}
-          </span>
+          </Link>
         ) : (
           !unavailable && (
             <button

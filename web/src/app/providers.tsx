@@ -13,6 +13,7 @@ import {
   walletConnectReady,
 } from "@/lib/wallet";
 import { WalletUIProvider } from "@/components/WalletUI";
+import { ProfileProvider } from "@/components/ProfileProvider";
 import { createAppKit } from "@reown/appkit/react";
 import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 
@@ -65,9 +66,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <WagmiProvider config={wallet.config}>
       <QueryClientProvider client={queryClient}>
-        <WalletUIProvider appKitOpen={wallet.openAppKit}>
-          {children}
-        </WalletUIProvider>
+        <ProfileProvider>
+          <WalletUIProvider appKitOpen={wallet.openAppKit}>
+            {children}
+          </WalletUIProvider>
+        </ProfileProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );
