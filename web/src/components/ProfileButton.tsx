@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { useAccount, useDisconnect } from "wagmi";
 import {
   Fingerprint,
@@ -25,7 +26,9 @@ function ModalShell({
   onClose: () => void;
   children: React.ReactNode;
 }) {
-  return (
+  // Portal to document.body: TopBar has backdrop-blur, which would make
+  // `fixed` position relative to the bar instead of the viewport.
+  return createPortal(
     <div
       className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
       onClick={onClose}
@@ -51,7 +54,8 @@ function ModalShell({
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

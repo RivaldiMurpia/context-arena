@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useAccount } from "wagmi";
 import {
@@ -92,7 +93,7 @@ function BioModal({ onClose }: { onClose: () => void }) {
     }
   };
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
       onClick={onClose}
@@ -139,7 +140,8 @@ function BioModal({ onClose }: { onClose: () => void }) {
           {saving ? "Waiting for signature…" : "Sign & save"}
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
