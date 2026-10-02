@@ -9,6 +9,7 @@ import {
   House,
   Lightning,
   Question,
+  User,
   X,
 } from "@phosphor-icons/react";
 import { ARENA_ADDRESS, EXPLORER_ADDR, shortAddr } from "@/lib/chain";
@@ -18,6 +19,7 @@ const NAV = [
   { href: "/", label: "Home", icon: House },
   { href: "/arena", label: "Arena", icon: Lightning },
   { href: "/history", label: "History", icon: ClockCounterClockwise },
+  { href: "/profile", label: "Profile", icon: User },
   { href: "/#how", label: "How it works", icon: Question },
 ];
 

@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { keccak256, stringToBytes } from "viem";
 
 /**
  * Supabase clients for wallet identity (profiles).
@@ -42,28 +43,62 @@ export function supabaseServer(): SupabaseClient {
 export interface Profile {
   wallet: string; // lowercase 0x address
   username: string;
+  bio: string;
+  /** renames used so far — the API caps this at 1 */
+  username_changes: number;
   created_at: string;
   updated_at: string;
+}
+
+/** Wallets get exactly one username change, ever. */
+export const MAX_USERNAME_CHANGES = 1;
+
+export function usernameChangesLeft(p: Profile | null): number {
+  if (!p) return MAX_USERNAME_CHANGES;
+  return Math.max(0, MAX_USERNAME_CHANGES - p.username_changes);
 }
 
 export function isValidUsername(name: string): boolean {
   return /^[A-Za-z0-9_]{3,20}$/.test(name);
 }
 
+export const BIO_MAX = 160;
+
+/** Single-line, trimmed bio. */
+export function normalizeBio(bio: string): string {
+  return bio
+    .replace(/[\r\n]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, BIO_MAX);
+}
+
 /**
- * The exact message the wallet must sign to link/change a username.
+ * Deterministic auto-generated username for first-time users:
+ * user_ + 8 hex chars from the wallet hash. Stable per wallet, so the
+ * claim modal can show it before anything is signed.
+ */
+export function generatedUsername(wallet: string): string {
+  const hash = keccak256(stringToBytes(wallet.toLowerCase()));
+  return `user_${hash.slice(2, 10)}`;
+}
+
+/**
+ * The exact message the wallet must sign to create/update a profile.
  * The API route reconstructs this itself and rejects anything else,
- * so a signature can't be replayed for a different username/wallet.
+ * so a signature can't be replayed for different data.
  */
 export function linkMessage(
   username: string,
   wallet: `0x${string}`,
-  timestamp: number
+  timestamp: number,
+  bio?: string
 ): string {
-  return (
+  let m =
     "Sign this message to link your Context Arena username.\n\n" +
     `Username: ${username}\n` +
     `Wallet: ${wallet}\n` +
-    `Timestamp: ${timestamp}`
-  );
+    `Timestamp: ${timestamp}`;
+  if (bio !== undefined) m += `\nBio: ${bio}`;
+  return m;
 }
