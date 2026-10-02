@@ -5,8 +5,9 @@ import { NextRequest, NextResponse } from "next/server";
 // per-IP rate limits). This route forwards read-only JSON-RPC calls from
 // Vercel's servers, which have reliable egress, with upstream failover,
 // retry-with-backoff on rate limits, and a short response cache.
-// Upstream failover order. If ALCHEMY_RPC_URL is set (Vercel env var),
-// Alchemy goes first — higher rate limits, dedicated quota.
+// Upstream failover order. Keyed providers go first — higher rate limits,
+// dedicated quota. Rivaldi sets their URLs as Vercel env vars
+// (ALCHEMY_RPC_URL, CHAINSTACK_RPC_URL); never hardcode them here.
 function getUpstreams(): string[] {
   const list = [
     "https://monad-testnet.api.onfinality.io/public",
@@ -14,6 +15,8 @@ function getUpstreams(): string[] {
     "https://monad-testnet.drpc.org",
     "https://testnet-rpc.monad.xyz",
   ];
+  const chainstack = (process.env.CHAINSTACK_RPC_URL || "").trim();
+  if (chainstack.startsWith("https://")) list.unshift(chainstack);
   const alchemy = (process.env.ALCHEMY_RPC_URL || "").trim();
   if (alchemy.startsWith("https://")) list.unshift(alchemy);
   return list;
