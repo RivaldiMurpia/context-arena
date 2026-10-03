@@ -7,8 +7,9 @@ import { NextRequest, NextResponse } from "next/server";
 // retry-with-backoff on rate limits, and a short response cache.
 // Upstream failover order. Keyed providers go first — higher rate limits,
 // dedicated quota. Rivaldi sets their URLs as Vercel env vars
-// (ALCHEMY_RPC_URL, QUICKNODE_RPC_URL, CHAINSTACK_RPC_URL);
-// never hardcode them here.
+// (ALCHEMY_RPC_URL, QUICKNODE_RPC_URL, DWELLIR_RPC_URL, SPECTRUM_RPC_URL,
+// CHAINSTACK_RPC_URL); never hardcode them here.
+// Alchemy is always primary: it is unshifted last so it stays first.
 function getUpstreams(): string[] {
   const list = [
     "https://monad-testnet.api.onfinality.io/public",
@@ -18,6 +19,10 @@ function getUpstreams(): string[] {
   ];
   const chainstack = (process.env.CHAINSTACK_RPC_URL || "").trim();
   if (chainstack.startsWith("https://")) list.unshift(chainstack);
+  const spectrum = (process.env.SPECTRUM_RPC_URL || "").trim();
+  if (spectrum.startsWith("https://")) list.unshift(spectrum);
+  const dwellir = (process.env.DWELLIR_RPC_URL || "").trim();
+  if (dwellir.startsWith("https://")) list.unshift(dwellir);
   const quicknode = (process.env.QUICKNODE_RPC_URL || "").trim();
   if (quicknode.startsWith("https://")) list.unshift(quicknode);
   const alchemy = (process.env.ALCHEMY_RPC_URL || "").trim();
