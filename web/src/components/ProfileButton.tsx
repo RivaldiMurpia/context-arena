@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { createPortal } from "react-dom";
-import { useAccount, useDisconnect } from "wagmi";
+import { useAccount, useBalance, useDisconnect } from "wagmi";
 import {
   Fingerprint,
   Lock,
@@ -12,7 +12,7 @@ import {
   User,
   X,
 } from "@phosphor-icons/react";
-import { shortAddr } from "@/lib/chain";
+import { fmtMon, shortAddr } from "@/lib/chain";
 import { isValidUsername } from "@/lib/supabase";
 import { useProfile } from "./ProfileProvider";
 import { useWalletUI } from "@/components/WalletUI";
@@ -188,6 +188,15 @@ export function ProfileButton() {
   const { openWallet } = useWalletUI();
   const { profile, loading, unavailable, changesLeft } = useProfile();
   const [modal, setModal] = useState<"claim" | "rename" | null>(null);
+  // Native MON balance, via the /api/rpc proxy (same transport as everything
+  // else). Refreshes every 15s so bets/claims show up without a reload.
+  const { data: monBal } = useBalance({
+    address,
+    query: { refetchInterval: 15_000 },
+  });
+  const monStr = monBal
+    ? fmtMon(monBal.value).replace(/\.?0+$/, "")
+    : null;
 
   if (!isConnected) {
     return (
@@ -206,6 +215,19 @@ export function ProfileButton() {
   return (
     <>
       <div className="flex h-10 items-center gap-1 rounded-full bg-elev py-1 pr-1 pl-4">
+        {monStr ? (
+          <span
+            className="tnum mr-1 rounded-full bg-void px-2.5 py-1 text-[12px] font-semibold whitespace-nowrap text-acid"
+            title="MON balance"
+          >
+            {monStr} <span className="font-normal text-faint">MON</span>
+          </span>
+        ) : (
+          <span
+            className="skeleton mr-1 h-5 w-16 rounded-full bg-white/[0.08]"
+            aria-hidden
+          />
+        )}
         {address && <WalletAvatar wallet={address} size={22} />}
         {loading ? (
           <span className="skeleton ml-1 h-4 w-16 rounded-md bg-white/[0.08]" />
