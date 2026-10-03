@@ -70,7 +70,7 @@ function llmProviders(): Provider[] {
   if (qwenKey) {
     list.push({
       name: "qwen",
-      baseUrl: clean(process.env.QWEN_BASE_URL ?? "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"),
+      baseUrl: clean(process.env.QWEN_BASE_URL ?? "https://maas.qwencloudapi.com/compatible-mode/v1"),
       model: process.env.QWEN_MODEL ?? "qwen3.8-max",
       key: qwenKey,
       // Qwen 3.8 Max is a reasoning model and some endpoints force thinking
