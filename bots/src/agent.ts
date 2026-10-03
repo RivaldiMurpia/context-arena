@@ -17,9 +17,9 @@ import {
  *   AGENT_INDEX=2 npm run agent  -> Whale
  * (Windows PowerShell: $env:AGENT_INDEX=0; npm run agent)
  *
- * Loop: read market state onchain -> ask LLM (Nebius -> Atria -> NIM fallback chain)
+ * Loop: read market state onchain -> ask LLM (Qwen -> Nebius -> Atria -> NIM fallback chain)
  *   -> execute BUY/SELL/HOLD.
- * Needs in bots/.env: at least one of NEBIUS_API_KEY / ATRIA_API_KEY / NVIDIA_API_KEY,
+ * Needs in bots/.env: at least one of QWEN_API_KEY / NEBIUS_API_KEY / ATRIA_API_KEY / NVIDIA_API_KEY,
  * plus ARENA_ADDRESS and AGENT_KEYS
  */
 
@@ -57,13 +57,29 @@ type Provider = {
   model: string;
   key: string;
   disableThinking?: boolean;
+  maxTokens?: number;
 };
 
-// Fallback chain: Nebius (primary) -> Atria ASI -> NVIDIA NIM.
+// Fallback chain: Qwen 3.8 Max (primary, Alibaba Cloud bounty) -> Nebius -> Atria ASI -> NVIDIA NIM.
 // (OpenCode Zen removed: its free tier 403s outside the OpenCode client.)
 function llmProviders(): Provider[] {
   const clean = (u: string) => u.replace(/\/+$/, "");
   const list: Provider[] = [];
+  // QWEN_API_KEY is the documented alias; DASHSCOPE_API_KEY also accepted.
+  const qwenKey = process.env.QWEN_API_KEY ?? process.env.DASHSCOPE_API_KEY;
+  if (qwenKey) {
+    list.push({
+      name: "qwen",
+      baseUrl: clean(process.env.QWEN_BASE_URL ?? "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"),
+      model: process.env.QWEN_MODEL ?? "qwen3.8-max",
+      key: qwenKey,
+      // Qwen 3.8 Max is a reasoning model and some endpoints force thinking
+      // on: the thinking trace burns output tokens, so it gets a much bigger
+      // budget than the 300-token default. The balanced-brace parser below
+      // extracts the JSON either way.
+      maxTokens: Number(process.env.QWEN_MAX_TOKENS ?? 4000),
+    });
+  }
   if (process.env.NEBIUS_API_KEY) {
     list.push({
       name: "nebius",
@@ -154,7 +170,7 @@ async function callChat(
       messages,
       response_format: { type: "json_object" },
       temperature: 0.7,
-      max_tokens: 300,
+      max_tokens: p.maxTokens ?? 300,
       // Raw-fetch equivalent of SDK extra_body: top-level passthrough field.
       ...(p.disableThinking ? { chat_template_kwargs: { enable_thinking: false } } : {}),
     }),
@@ -195,7 +211,7 @@ function parseAction(providerName: string, text: string): Action {
 async function decide(persona: string, market: string): Promise<Action & { via: string }> {
   const providers = llmProviders();
   if (providers.length === 0)
-    throw new Error("set NEBIUS_API_KEY, ATRIA_API_KEY, or NVIDIA_API_KEY in bots/.env");
+    throw new Error("set QWEN_API_KEY, NEBIUS_API_KEY, ATRIA_API_KEY, or NVIDIA_API_KEY in bots/.env");
   const system =
     persona +
     '\n\nRespond with ONLY a valid JSON object, nothing else — no greetings, no explanations, no markdown: {"action":"BUY"|"SELL"|"HOLD","amount":<number in MON for BUY, in CTX for SELL, 0 for HOLD>,"reason":"<one short sentence>"}';
@@ -258,7 +274,7 @@ async function main() {
   const keys = (process.env.AGENT_KEYS ?? "").split(",").map((s) => s.trim()).filter(Boolean);
   if (!keys[idx]) throw new Error(`AGENT_KEYS[${idx}] missing in bots/.env`);
   if (!process.env.NEBIUS_API_KEY && !process.env.ATRIA_API_KEY && !process.env.NVIDIA_API_KEY)
-    throw new Error("set NEBIUS_API_KEY (primary), ATRIA_API_KEY, or NVIDIA_API_KEY in bots/.env");
+    throw new Error("set QWEN_API_KEY (primary), NEBIUS_API_KEY, ATRIA_API_KEY, or NVIDIA_API_KEY in bots/.env");
 
   const arena = arenaAddress();
   const pub = publicClient();
