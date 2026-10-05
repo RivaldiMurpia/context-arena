@@ -2,9 +2,62 @@
 
 import Link from "next/link";
 import { ArrowSquareOut } from "@phosphor-icons/react";
+import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import type { MyBid } from "@/hooks/useMyBids";
-import { AGENTS, EXPLORER_TX, fmtMon, shortHash } from "@/lib/chain";
+import { AGENTS, ARENA_ADDRESS, EXPLORER_TX, fmtMon, shortHash } from "@/lib/chain";
+import { ABI } from "@/lib/arena";
 import { AgentMark } from "@/components/home/AgentMark";
+
+/** Claim button for a settled-but-unclaimed bid (refund or win). */
+function ClaimButton({ bid }: { bid: MyBid }) {
+  const { writeContract, data: txHash, isPending, error, reset } =
+    useWriteContract();
+  const { isLoading: mining, isSuccess: done } = useWaitForTransactionReceipt({
+    hash: txHash,
+  });
+
+  const claimed = bid.claimed || done;
+
+  if (claimed || bid.claimed) {
+    const label = bid.status === "refund" ? "REFUNDED" : "CLAIMED";
+    return (
+      <span className="tnum text-[12px] text-faint">
+        {bid.status === "refund" ? "REFUND · " : ""}
+        {label}
+      </span>
+    );
+  }
+
+  const label = `Claim ${fmtMon(bid.payout ?? bid.amount, 2)} MON`;
+  return (
+    <span className="inline-flex flex-col items-end gap-1">
+      <button
+        onClick={() => {
+          reset();
+          writeContract({
+            address: ARENA_ADDRESS,
+            abi: ABI,
+            functionName: "claim",
+            args: [bid.roundId],
+          });
+        }}
+        disabled={isPending || mining}
+        className="tnum rounded-lg bg-acid px-3 py-1.5 text-[12px] font-semibold text-black transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50"
+      >
+        {isPending
+          ? "Confirm in wallet…"
+          : mining
+            ? "Claiming…"
+            : label}
+      </button>
+      {error && (
+        <span className="tnum max-w-[180px] text-right text-[10px] text-red-400">
+          Failed — retry
+        </span>
+      )}
+    </span>
+  );
+}
 
 export function BidResult({ bid }: { bid: MyBid }) {
   if (bid.status === "pending")
@@ -19,17 +72,22 @@ export function BidResult({ bid }: { bid: MyBid }) {
   if (bid.status === "refund")
     return (
       <span className="tnum text-[12px] text-ash">
-        REFUND{bid.claimed ? "" : "ABLE"}
+        {bid.claimed ? "REFUNDED" : <ClaimButton bid={bid} />}
       </span>
     );
   // won
   const profit = bid.payout !== null ? bid.payout - bid.amount : null;
   return (
-    <span className="tnum text-[13px] font-medium text-acid">
-      +{profit !== null ? fmtMon(profit, 2) : "?"}
-      <span className="ml-1.5 text-[10px] text-faint">
-        {bid.claimed ? "CLAIMED" : "UNCLAIMED"}
+    <span className="tnum inline-flex flex-col items-end gap-1 text-[13px] font-medium text-acid">
+      <span>
+        +{profit !== null ? fmtMon(profit, 2) : "?"}
+        <span className="ml-1.5 text-[10px] text-faint">MON</span>
       </span>
+      {bid.claimed ? (
+        <span className="text-[10px] text-faint">CLAIMED</span>
+      ) : (
+        <ClaimButton bid={bid} />
+      )}
     </span>
   );
 }
