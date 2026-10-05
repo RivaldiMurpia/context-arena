@@ -8,6 +8,7 @@ import {
   ClockCounterClockwise,
   House,
   Lightning,
+  Pulse as PulseIcon,
   Question,
   User,
   X,
@@ -19,6 +20,7 @@ const NAV = [
   { href: "/", label: "Home", icon: House },
   { href: "/arena", label: "Arena", icon: Lightning },
   { href: "/history", label: "History", icon: ClockCounterClockwise },
+  { href: "/pulse", label: "Pulse", icon: PulseIcon },
   { href: "/profile", label: "Profile", icon: User },
   { href: "/#how", label: "How it works", icon: Question },
 ];
