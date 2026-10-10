@@ -11,6 +11,7 @@ import { BettingPanel } from "@/components/BettingPanel";
 import { ActivityFeed } from "@/components/ActivityFeed";
 import { RoundHistory } from "@/components/RoundHistory";
 import { HowItWorks } from "@/components/HowItWorks";
+import { WinFx } from "@/components/WinFx";
 
 /**
  * Compact trading-terminal header: round identity + phase on the left,
@@ -106,6 +107,8 @@ export default function ArenaPage() {
 
       {hasData && (
         <>
+          <WinFx round={a.round} roundId={a.roundId} />
+
           <ArenaPageHeader
             round={a.round}
             roundId={a.roundId}
