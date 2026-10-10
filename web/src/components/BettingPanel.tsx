@@ -80,6 +80,28 @@ export function BettingPanel({
     return (mine * round.betPool) / round.winningBets;
   })();
 
+  // Live payout preview for the current pick + amount. Once I have already
+  // bet on this agent this round, the amount rides on top of that stake —
+  // same math the contract settlement uses (amount * pool / winningBets).
+  const payoutPreview = (() => {
+    if (phase !== "betting") return null;
+    const v = parseFloat(amount);
+    if (!Number.isFinite(v) || v <= 0 || !round) return null;
+    let amt: bigint;
+    try {
+      amt = parseEther(amount || "0");
+    } catch {
+      return null; // malformed amount ("1.2.3") — hide preview, don't crash
+    }
+    const picked = agents.find((x) => x.id === pick);
+    if (!picked) return null;
+    const onPick = picked.betsOn + amt;
+    const pool = round.betPool + amt;
+    const iWin = myBets[pick] ? myBets[pick] + amt : amt;
+    const mult = Number((pool * 100n) / onPick) / 100;
+    return { payout: (iWin * pool) / onPick, mult };
+  })();
+
   const myTotal = myBets.reduce((a, b) => a + b, 0n);
 
   const placeBet = () => {
@@ -120,6 +142,10 @@ export function BettingPanel({
         {AGENTS.map((a) => {
           const st = agents.find((x) => x.id === a.id);
           const selected = pick === a.id;
+          const poolPct =
+            st && round && round.betPool > 0n
+              ? Number((st.betsOn * 100n) / round.betPool)
+              : 0;
           return (
             <button
               key={a.id}
@@ -140,6 +166,15 @@ export function BettingPanel({
                 </span>
                 <span className="tnum block text-[11px] text-faint">
                   {st ? `${fmtMon(st.betsOn)} MON backed` : "—"}
+                </span>
+                <span
+                  className="mt-1 block h-[3px] w-full overflow-hidden rounded-full bg-[rgba(255,255,255,0.08)]"
+                  title={`${poolPct}% of the bet pool`}
+                >
+                  <span
+                    className="block h-full bg-acid transition-[width] duration-500"
+                    style={{ width: `${poolPct}%` }}
+                  />
                 </span>
               </span>
               <span className="text-right">
@@ -193,6 +228,13 @@ export function BettingPanel({
           />
           <span className="tnum text-[12px] text-faint">MON</span>
         </div>
+        {payoutPreview && (
+          <p className="tnum mt-1.5 text-[11px] text-ash">
+            if <span className="text-bone">{AGENTS[pick].name}</span> wins ≈{" "}
+            <span className="text-acid">{fmtMon(payoutPreview.payout)} MON</span>{" "}
+            <span className="text-faint">({payoutPreview.mult.toFixed(2)}×)</span>
+          </p>
+        )}
       </div>
 
       {!isConnected ? (
