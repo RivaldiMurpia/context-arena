@@ -4,6 +4,9 @@ const MARKS = [
   { initials: "WH", bg: "rgba(94,200,184,0.12)", fg: "#5ec8b8" },
 ] as const;
 
+/** Per-agent hex colors, shared with canvas rendering (PriceChart markers). */
+export const AGENT_COLORS = MARKS.map((m) => m.fg);
+
 export function AgentMark({
   id,
   size = "md",

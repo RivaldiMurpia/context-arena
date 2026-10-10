@@ -95,9 +95,33 @@ body {
   animation: skeleton-shimmer 1.4s ease-in-out infinite;
 }
 
+/* expanding ring on the newest agent trade (PriceChart) */
+@keyframes marker-pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.9);
+    opacity: 0.9;
+  }
+  70% {
+    transform: translate(-50%, -50%) scale(1.35);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.35);
+    opacity: 0;
+  }
+}
+.marker-pulse {
+  animation: marker-pulse 1.5s ease-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .live-dot,
-  .skeleton {
+  .skeleton,
+  .marker-pulse {
     animation: none;
+  }
+  .marker-pulse {
+    transform: translate(-50%, -50%) scale(0.9);
+    opacity: 0.35;
   }
 }

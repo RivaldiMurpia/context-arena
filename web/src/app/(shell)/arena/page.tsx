@@ -82,6 +82,9 @@ function ArenaPageHeader({
 export default function ArenaPage() {
   const a = useArena();
   const hasData = a.roundId !== null;
+  const trades = a.feed.filter(
+    (f): f is Extract<FeedItem, { kind: "trade" }> => f.kind === "trade"
+  );
 
   return (
     <>
@@ -118,6 +121,7 @@ export default function ArenaPage() {
                 priceHistory={a.priceHistory}
                 round={a.round}
                 roundTrades={a.roundTrades}
+                trades={trades}
               />
             </div>
             <div className="lg:col-span-4">
@@ -133,10 +137,7 @@ export default function ArenaPage() {
               <Leaderboard
                 agents={a.agents}
                 price={a.price}
-                trades={a.feed.filter(
-                  (f): f is Extract<FeedItem, { kind: "trade" }> =>
-                    f.kind === "trade"
-                )}
+                trades={trades}
                 winnerId={
                   a.round?.settled ? a.round.winnerAgentId : null
                 }

@@ -2,8 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { PriceChart } from "./PriceChart";
-import type { PricePoint, RoundInfo } from "@/lib/arena";
+import type { FeedItem, PricePoint, RoundInfo } from "@/lib/arena";
 import { fmtMon } from "@/lib/chain";
+
+type TradeItem = Extract<FeedItem, { kind: "trade" }>;
 
 function FlashPrice({ value }: { value: bigint }) {
   const [flash, setFlash] = useState<"up" | "down" | null>(null);
@@ -36,11 +38,13 @@ export function LiveSection({
   priceHistory,
   round,
   roundTrades,
+  trades = [],
 }: {
   price: bigint;
   priceHistory: PricePoint[];
   round: RoundInfo | null;
   roundTrades: number;
+  trades?: TradeItem[];
 }) {
   const start = round?.startPrice ?? null;
   const chg =
@@ -81,7 +85,12 @@ export function LiveSection({
       </div>
 
       <div className="mt-4 border-y hairline py-2">
-        <PriceChart data={priceHistory} startPrice={start} height={250} />
+        <PriceChart
+          data={priceHistory}
+          startPrice={start}
+          trades={trades}
+          height={250}
+        />
       </div>
 
       <div className="tnum mt-3 grid grid-cols-3 gap-2 text-[12px]">
