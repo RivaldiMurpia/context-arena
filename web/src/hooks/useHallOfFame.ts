@@ -10,15 +10,21 @@ export interface FameEntry {
   /** betPool / winningBets, null when nobody backed the winner (refundable). */
   payoutX: number | null;
   refundMode: boolean;
+  /** Total MON in the round's bet pool — 0 means the round had no bets. */
+  betPool: bigint;
 }
 
 /**
  * Last N settled rounds, newest first. Scans backwards from the latest
  * round with cheap eth_calls (no event scan needed).
+ *
+ * `scanned` reports loop progress so the UI can show a live
+ * "scanning N rounds…" line instead of an ambiguous blank skeleton.
  */
 export function useHallOfFame(count: number) {
   const [entries, setEntries] = useState<FameEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [scanned, setScanned] = useState(0);
 
   useEffect(() => {
     let dead = false;
@@ -40,10 +46,12 @@ export function useHallOfFame(count: number) {
                   ? Number((r.betPool * 100n) / r.winningBets) / 100
                   : null,
               refundMode: r.refundMode,
+              betPool: r.betPool,
             });
           }
           rid -= 1n;
           scanned += 1;
+          if (!dead) setScanned(scanned);
         }
         if (!dead) setEntries(out);
       } catch {
@@ -57,5 +65,5 @@ export function useHallOfFame(count: number) {
     };
   }, [count]);
 
-  return { entries, loading };
+  return { entries, loading, scanned };
 }

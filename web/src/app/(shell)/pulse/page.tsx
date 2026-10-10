@@ -48,6 +48,8 @@ function AgentStrip({ data }: { data: PulseData }) {
       <div className="mt-3 grid grid-cols-1 divide-y hairline border-y hairline sm:grid-cols-3 sm:divide-x sm:divide-y-0">
         {data.agents.map((a) => {
           const meta = AGENTS[a.id];
+          // prefer the client-side recount; the indexer aggregate undercounts
+          const won = data.roundsWonOverride?.[a.id] ?? a.roundsWon;
           return (
             <div key={a.id} className="flex items-center gap-4 py-4 sm:px-5 sm:first:pl-0 sm:last:pr-0">
               <AgentMark id={a.id} size="md" />
@@ -61,7 +63,7 @@ function AgentStrip({ data }: { data: PulseData }) {
               </div>
               <div className="text-right">
                 <p className="tnum text-2xl font-semibold text-acid">
-                  {a.roundsWon}
+                  {won}
                 </p>
                 <p className="tnum text-[10px] tracking-[0.14em] text-faint">
                   ROUNDS WON
@@ -151,6 +153,10 @@ function RecentRounds({ data }: { data: PulseData }) {
         {data.rounds.map((r) => {
           const meta =
             r.winnerAgentId !== null ? AGENTS[Number(r.winnerAgentId)] : undefined;
+          // A round with zero bets settled into refunds by definition —
+          // don't dress it up as "REFUND"; it simply had no players.
+          const noBets = r.status === "REFUND" && r.betCount <= 0;
+          const label = noBets ? "NO BETS" : r.status;
           return (
             <div
               key={r.id}
@@ -160,16 +166,16 @@ function RecentRounds({ data }: { data: PulseData }) {
               <span className="min-w-0">
                 <span
                   className={`tnum text-[11px] font-semibold tracking-[0.1em] ${
-                    r.status === "SETTLED"
-                      ? "text-acid"
-                      : r.status === "REFUND"
-                        ? "text-ash"
-                        : "text-bone"
+                    noBets
+                      ? "text-faint"
+                      : r.status === "SETTLED"
+                        ? "text-acid"
+                        : "text-ash"
                   }`}
                 >
-                  {r.status}
+                  {label}
                 </span>
-                {meta && (
+                {meta && !noBets && (
                   <span className="block truncate text-[12px] text-faint">
                     {meta.name}
                   </span>

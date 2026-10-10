@@ -230,6 +230,11 @@ export function phaseOf(
 ): "betting" | "trading" | "settling" | "settled" | "idle" {
   if (!round) return "idle";
   if (round.settled) return "settled";
+  // Time is the source of truth: once endTime has passed the round is
+  // over even if the settle tx hasn't landed yet (activeRound can still
+  // read true for a few seconds). Shows SETTLING… instead of a frozen
+  // 00:00 countdown.
+  if (now > Number(round.endTime)) return "settling";
   if (!hasActive) return "settling";
   if (now <= Number(round.bettingCloseTime)) return "betting";
   return "trading";

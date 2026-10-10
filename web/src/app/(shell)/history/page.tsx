@@ -14,13 +14,18 @@ import { AGENTS, fmtMon } from "@/lib/chain";
 import { AgentMark } from "@/components/home/AgentMark";
 
 function WinnersTable() {
-  const { entries, loading } = useHallOfFame(30);
+  const { entries, loading, scanned } = useHallOfFame(30);
 
   return (
     <section aria-label="Round winners" className="mt-8">
       <h2 className="font-display text-[20px] font-bold tracking-tight">
         Winners
       </h2>
+      {loading && (
+        <p className="tnum mt-1.5 text-[12px] text-faint" role="status">
+          scanning {scanned} rounds…
+        </p>
+      )}
       <div className="mt-3 overflow-x-auto">
         <div className="min-w-[560px]">
           <div className="tnum grid grid-cols-[0.6fr_1.4fr_1fr_0.8fr] gap-4 border-b hairline pb-2.5 text-[10px] tracking-[0.16em] text-faint">
@@ -64,8 +69,22 @@ function WinnersTable() {
                   <span className="tnum text-[14px] font-medium text-acid">
                     {e.payoutX.toFixed(2)}×
                   </span>
+                ) : e.betPool === 0n ? (
+                  // nobody played this round — not a refund, just empty
+                  <span
+                    className="tnum text-[12px] text-faint"
+                    title="No bets were placed this round"
+                  >
+                    — no bets
+                  </span>
                 ) : (
-                  <span className="tnum text-[12px] text-faint">REFUND</span>
+                  // bets existed but nobody backed the winner → refundable
+                  <span
+                    className="tnum text-[12px] text-faint"
+                    title={`${fmtMon(e.betPool)} MON wagered, nobody backed the winner — bets refundable`}
+                  >
+                    REFUND
+                  </span>
                 )}
               </span>
             </div>

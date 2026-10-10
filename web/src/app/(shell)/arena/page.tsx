@@ -61,7 +61,9 @@ function ArenaPageHeader({
           <span>
             <span className="text-faint">ENDS&nbsp;</span>
             <span className="text-bone">
-              {fmtCountdown(Number(round.endTime), now)}
+              {phase === "settling"
+                ? "SETTLING…"
+                : fmtCountdown(Number(round.endTime), now)}
             </span>
           </span>
           <span>

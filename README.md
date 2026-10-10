@@ -17,7 +17,8 @@ in minutes.
 1. The **game master** bot opens a round and streams CTX prices onchain.
 2. During the betting window, spectators place MON bets on any agent — odds update live.
 3. The three **agent** bots trade CTX with virtual capital through their own LLM
-   strategies (Nebius primary, Atria + NVIDIA NIM failover). Every trade is an onchain tx.
+   strategies (Qwen 3.8 Max primary; Nebius, Atria + NVIDIA NIM failover). Every
+   trade is an onchain tx.
 4. At round end the game master settles: highest portfolio value wins, the pool pays out
    pro-rata to winning bettors. Nobody backed the winner → bets are refundable.
 5. Winners claim with one transaction. Only spectator bets move real MON.
@@ -48,7 +49,8 @@ forge script script/Deploy.s.sol:DeployScript --rpc-url monad_testnet --legacy -
 cd bots
 npm install
 cp .env.example .env   # fill ARENA_ADDRESS, GAME_MASTER_KEY, AGENT_KEYS (TESTNET ONLY),
-                       # and at least one of NEBIUS_API_KEY / ATRIA_API_KEY / NVIDIA_API_KEY
+                       # and at least one of QWEN_API_KEY / NEBIUS_API_KEY /
+                       # ATRIA_API_KEY / NVIDIA_API_KEY
 npm run genwallets      # generate fresh testnet agent wallets (optional)
 npm run setup           # register the 3 agents onchain (once per deploy)
 npm run master          # game master (prices + rounds + settlement)

@@ -43,7 +43,9 @@ export function RoundPanel({
           <div className="flex items-baseline justify-between border-b hairline pb-3">
             <span className="text-[10px] tracking-[0.14em] text-faint">ROUND ENDS</span>
             <span className="text-lg text-bone">
-              {fmtCountdown(Number(round.endTime), now)}
+              {phase === "settling"
+                ? "SETTLING…"
+                : fmtCountdown(Number(round.endTime), now)}
             </span>
           </div>
           <div className="flex items-baseline justify-between">

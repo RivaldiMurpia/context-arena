@@ -41,6 +41,13 @@ export interface PulseData {
   bettors: PulseBettor[];
   agents: PulseAgent[];
   rounds: PulseRound[];
+  /**
+   * ROUNDS WON recounted client-side from the full indexed round list (up to
+   * 1000 rounds). The indexer's per-agent `roundsWon` aggregate undercounts
+   * in production (stuck at 0–1 while hundreds of rounds have settled), so
+   * the UI prefers this. Keyed by agentId; null when the source is absent.
+   */
+  roundsWonOverride: Record<number, number> | null;
   /** true when serving the local preview dataset instead of the live indexer */
   mock: boolean;
 }
@@ -71,6 +78,12 @@ const PULSE_QUERY = /* GraphQL */ `
       totalVolume
       betCount
       tradeCount
+    }
+    RoundAll: Round(order_by: { startTime: desc }, limit: 1000) {
+      id
+      status
+      winnerAgentId
+      betCount
     }
   }
 `;
@@ -115,7 +128,7 @@ export function pulseMockEnabled(): boolean {
  */
 export async function fetchPulseData(): Promise<PulseData | null> {
   if (pulseMockEnabled()) {
-    return { ...mockPulseData(), mock: true };
+    return { ...mockPulseData(), roundsWonOverride: null, mock: true };
   }
   const endpoint = pulseEndpoint();
   if (!endpoint) return null;
@@ -179,7 +192,32 @@ export async function fetchPulseData(): Promise<PulseData | null> {
         }))
     : [];
 
-  return { bettors, agents, rounds, mock: false };
+  // Recount ROUNDS WON from the full indexed round list — the indexer's
+  // per-agent aggregate is known to undercount (stuck at 0–1 while hundreds
+  // of rounds have settled). No-bet rounds are excluded: an agent can't
+  // "win" a round nobody played.
+  let roundsWonOverride: Record<number, number> | null = null;
+  if (Array.isArray(data.RoundAll)) {
+    const tally: Record<number, number> = { 0: 0, 1: 0, 2: 0 };
+    let settled = 0;
+    for (const r of data.RoundAll as Array<Record<string, unknown>>) {
+      if (asInt(r.betCount) <= 0) continue;
+      const w = r.winnerAgentId;
+      const wid =
+        typeof w === "string"
+          ? asInt(w)
+          : typeof w === "number"
+            ? w
+            : Number.NaN;
+      if (Number.isInteger(wid) && wid in tally) {
+        tally[wid] += 1;
+        settled += 1;
+      }
+    }
+    if (settled > 0) roundsWonOverride = tally;
+  }
+
+  return { bettors, agents, rounds, roundsWonOverride, mock: false };
 }
 
 /** Derived: net profit/loss across all rounds, in wei. */
@@ -222,5 +260,5 @@ function mockPulseData(): Omit<PulseData, "mock"> {
     { id: "23", status: "SETTLED", winnerAgentId: "2", totalVolume: 21n * MON, betCount: 13, tradeCount: 25 },
     { id: "22", status: "SETTLED", winnerAgentId: "1", totalVolume: 8n * MON, betCount: 6, tradeCount: 18 },
   ];
-  return { bettors, agents, rounds };
+  return { bettors, agents, rounds, roundsWonOverride: null };
 }
