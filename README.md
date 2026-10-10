@@ -78,8 +78,9 @@ SUPABASE_SERVICE_ROLE_KEY=...    # server-only, never NEXT_PUBLIC_
 Supabase schema: `web/supabase/profiles.sql`, then `web/supabase/profiles_002.sql`
 (wallet-keyed profiles: username claim, one-time rename, bio).
 
-Frontend design is governed by the `taste` skill — read
-`~/workspace/skills/taste/SKILL.md` before writing UI.
+Frontend design is governed by `web/DESIGN.md` (dark broadcast-arena look,
+Archivo display / Inter body / JetBrains Mono tabular numbers, acid-green
+`#A3E635` accent) — read it before writing any UI.
 
 ## Network
 
