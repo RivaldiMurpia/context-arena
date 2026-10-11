@@ -2,10 +2,9 @@
 
 import { useArena, fmtCountdown, phaseOf } from "@/hooks/useArena";
 import type { FeedItem, RoundInfo } from "@/lib/arena";
-import { fmtMon } from "@/lib/chain";
+import { AGENTS, fmtMon } from "@/lib/chain";
 import { PhasePill } from "@/components/PhasePill";
 import { LiveSection } from "@/components/LiveSection";
-import { RoundPanel } from "@/components/RoundPanel";
 import { Leaderboard } from "@/components/Leaderboard";
 import { BettingPanel } from "@/components/BettingPanel";
 import { ActivityFeed } from "@/components/ActivityFeed";
@@ -17,18 +16,15 @@ import { WinFx } from "@/components/WinFx";
 function ArenaSkeleton() {
   return (
     <div aria-hidden className="pt-6">
-      <div className="flex items-center gap-3">
-        <div className="skeleton h-3 w-3 rounded-full bg-white/[0.08]" />
-        <div className="skeleton h-6 w-40 rounded-lg bg-white/[0.06]" />
-        <div className="skeleton ml-auto h-6 w-48 rounded-lg bg-white/[0.06]" />
+      <div className="skeleton h-[92px] rounded-2xl bg-white/[0.04]" />
+      <div className="grid grid-cols-1 gap-x-6 gap-y-10 pt-6 lg:grid-cols-12">
+        <div className="space-y-10 lg:col-span-8">
+          <div className="skeleton h-[440px] rounded-2xl bg-white/[0.04]" />
+          <div className="skeleton h-[240px] rounded-2xl bg-white/[0.04]" />
+        </div>
+        <div className="skeleton h-[420px] rounded-2xl bg-white/[0.04] lg:col-span-4" />
       </div>
-      <div className="grid grid-cols-1 gap-x-6 gap-y-8 pt-5 lg:grid-cols-12">
-        <div className="skeleton h-[360px] rounded-2xl bg-white/[0.04] lg:col-span-8" />
-        <div className="skeleton h-[360px] rounded-2xl bg-white/[0.04] lg:col-span-4" />
-        <div className="skeleton h-[220px] rounded-2xl bg-white/[0.04] lg:col-span-8" />
-        <div className="skeleton h-[220px] rounded-2xl bg-white/[0.04] lg:col-span-4" />
-      </div>
-      <p className="tnum mt-6 flex items-center gap-3 text-[13px] text-ash">
+      <p className="tnum mt-8 flex items-center gap-3 text-[13px] text-ash">
         <span className="live-dot inline-block h-2 w-2 rounded-full bg-acid" />
         connecting to Monad testnet…
       </p>
@@ -37,11 +33,11 @@ function ArenaSkeleton() {
 }
 
 /**
- * Compact trading-terminal header: round identity + phase on the left,
- * the numbers that matter for a bettor on the right. The shell provides
- * the sidebar, top bar and footer.
+ * Broadcast scoreboard: one strip that owns round identity, phase, the single
+ * countdown and the pool. Everything below the fold reads against it — no
+ * other element on the page repeats these numbers.
  */
-function ArenaPageHeader({
+function Scoreboard({
   round,
   roundId,
   hasActive,
@@ -55,34 +51,49 @@ function ArenaPageHeader({
   live: boolean;
 }) {
   const phase = phaseOf(round, hasActive, now);
-  return (
-    <div className="flex flex-wrap items-center gap-x-5 gap-y-3 pt-6">
-      <div className="flex items-center gap-3">
-        <span
-          className={`live-dot inline-block h-2 w-2 rounded-full ${live ? "bg-acid" : "bg-faint"}`}
-          aria-hidden
-        />
-        <h1 className="font-display text-[22px] font-semibold tracking-tight">
-          Arena{" "}
-          <span className="tnum font-normal text-ash">
-            #{roundId !== null ? roundId.toString() : "—"}
-          </span>
-        </h1>
-        <PhasePill round={round} hasActive={hasActive} now={now} />
-      </div>
+  const winner =
+    round?.settled ? (AGENTS[Number(round.winnerAgentId)] ?? null) : null;
 
-      {round && !round.settled && (
-        <div className="tnum ml-auto flex flex-wrap items-center gap-x-5 gap-y-1 text-[12px]">
-          {/* Single countdown source for the page. Label follows the phase:
-              BETTING CLOSES while betting is open, ROUND ENDS afterwards;
-              hidden while settling (the phase pill says SETTLING…). */}
-          {phase !== "settling" && (
-            <span>
-              <span className="text-faint">
+  return (
+    <section
+      aria-label="Round scoreboard"
+      className="relative mt-6 overflow-hidden rounded-2xl border hairline bg-obsidian px-5 py-4 md:px-7 md:py-5"
+    >
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(70% 140% at 85% 0%, rgba(163,230,53,0.07), transparent 70%)",
+        }}
+        aria-hidden
+      />
+      <div className="relative flex flex-wrap items-end justify-between gap-x-10 gap-y-4">
+        <div>
+          <p className="tnum flex items-center gap-2 text-[10px] tracking-[0.2em] text-faint">
+            {live && (
+              <span
+                className="live-dot inline-block h-1.5 w-1.5 rounded-full bg-acid"
+                aria-hidden
+              />
+            )}
+            ROUND
+          </p>
+          <div className="mt-1 flex items-center gap-3">
+            <span className="font-display font-wide text-3xl font-extrabold tracking-tight text-bone md:text-4xl">
+              #{roundId !== null ? roundId.toString() : "—"}
+            </span>
+            <PhasePill round={round} hasActive={hasActive} now={now} />
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-end gap-x-10 gap-y-4">
+          {/* Single countdown source for the page; hidden while settling. */}
+          {round && !round.settled && phase !== "settling" && (
+            <div>
+              <p className="tnum text-[10px] tracking-[0.2em] text-faint">
                 {phase === "betting" ? "BETTING CLOSES" : "ROUND ENDS"}
-                &nbsp;
-              </span>
-              <span className="text-bone">
+              </p>
+              <p className="tnum mt-1 text-3xl font-semibold tracking-tight text-bone md:text-4xl">
                 {fmtCountdown(
                   Number(
                     phase === "betting"
@@ -91,22 +102,41 @@ function ArenaPageHeader({
                   ),
                   now
                 )}
-              </span>
-            </span>
+              </p>
+            </div>
           )}
-          <span>
-            <span className="text-faint">POOL&nbsp;</span>
-            <span className="text-acid">{fmtMon(round.betPool)} MON</span>
-          </span>
+
+          {round?.settled && winner && (
+            <div>
+              <p className="tnum text-[10px] tracking-[0.2em] text-faint">
+                WINNER @ {fmtMon(round.endPrice)}
+              </p>
+              <p className="mt-1 font-display text-2xl font-bold tracking-tight text-bone md:text-3xl">
+                {winner.name}
+              </p>
+            </div>
+          )}
+
+          {round && (
+            <div>
+              <p className="tnum text-[10px] tracking-[0.2em] text-faint">
+                {round.settled ? "POOL PAID" : "POOL"}
+              </p>
+              <p className="tnum mt-1 text-2xl font-semibold text-acid md:text-3xl">
+                {fmtMon(round.betPool)}{" "}
+                <span className="text-[13px] font-normal text-ash">MON</span>
+              </p>
+            </div>
+          )}
         </div>
+      </div>
+
+      {!round && (
+        <p className="relative mt-2 text-sm text-ash">
+          No rounds yet. The game master opens a new round every few minutes.
+        </p>
       )}
-      {round?.settled && (
-        <div className="tnum ml-auto text-[12px]">
-          <span className="text-faint">POOL PAID&nbsp;</span>
-          <span className="text-bone">{fmtMon(round.betPool)} MON</span>
-        </div>
-      )}
-    </div>
+    </section>
   );
 }
 
@@ -132,7 +162,7 @@ export default function ArenaPage() {
         <>
           <WinFx round={a.round} roundId={a.roundId} />
 
-          <ArenaPageHeader
+          <Scoreboard
             round={a.round}
             roundId={a.roundId}
             hasActive={a.hasActive}
@@ -140,8 +170,8 @@ export default function ArenaPage() {
             live={a.hasActive && a.status === "live"}
           />
 
-          <div className="grid grid-cols-1 gap-x-6 gap-y-8 pt-5 lg:grid-cols-12">
-            <div className="lg:col-span-8">
+          <div className="grid grid-cols-1 gap-x-6 gap-y-10 pt-6 lg:grid-cols-12">
+            <div className="space-y-10 lg:col-span-8">
               <LiveSection
                 price={a.price}
                 priceHistory={a.priceHistory}
@@ -149,17 +179,6 @@ export default function ArenaPage() {
                 roundTrades={a.roundTrades}
                 trades={trades}
               />
-            </div>
-            <div className="lg:col-span-4">
-              <RoundPanel
-                round={a.round}
-                roundId={a.roundId}
-                hasActive={a.hasActive}
-                now={a.now}
-              />
-            </div>
-
-            <div className="lg:col-span-8">
               <Leaderboard
                 agents={a.agents}
                 price={a.price}
@@ -168,6 +187,7 @@ export default function ArenaPage() {
                   a.round?.settled ? a.round.winnerAgentId : null
                 }
               />
+              <ActivityFeed feed={a.feed} />
             </div>
             <div className="lg:col-span-4">
               <div className="lg:sticky lg:top-24">
@@ -179,13 +199,9 @@ export default function ArenaPage() {
                   now={a.now}
                 />
               </div>
-            </div>
-
-            <div className="lg:col-span-8">
-              <ActivityFeed feed={a.feed} />
-            </div>
-            <div className="lg:col-span-4">
-              <RoundHistory roundCount={a.roundCount} />
+              <div className="mt-10">
+                <RoundHistory roundCount={a.roundCount} />
+              </div>
             </div>
           </div>
 

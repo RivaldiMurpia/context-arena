@@ -11,7 +11,7 @@ const PHASE_COPY: Record<string, { label: string; cls: string }> = {
   idle: { label: "IDLE", cls: "bg-elev text-faint" },
 };
 
-/** Shared round phase pill — used by the arena header and RoundPanel. */
+/** Shared round phase pill — used by the arena scoreboard and panels. */
 export function PhasePill({
   round,
   hasActive,

@@ -36,7 +36,7 @@ export default function HomePage() {
 
       {a.status === "loading" && !hasData && (
         <div aria-hidden className="pt-5">
-          <div className="skeleton h-[220px] rounded-2xl bg-white/[0.04]" />
+          <div className="skeleton h-[380px] rounded-2xl bg-white/[0.04]" />
           <div className="mt-10 grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-[2fr_1fr]">
             <div className="space-y-3">
               {[0, 1, 2].map((i) => (

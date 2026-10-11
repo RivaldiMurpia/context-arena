@@ -35,7 +35,7 @@ function Sparkline({ points }: { points: PricePoint[] }) {
     <svg
       viewBox="0 0 200 64"
       preserveAspectRatio="none"
-      className="h-16 w-full"
+      className="h-10 w-full"
       aria-hidden
     >
       <polyline
@@ -51,6 +51,12 @@ function Sparkline({ points }: { points: PricePoint[] }) {
   );
 }
 
+/**
+ * Broadcast hero: oversized expanded headline with the live market strip
+ * running across the bottom of the same panel (price + sparkline, round,
+ * countdown, pool). Secondary messages rotate inside the headline block;
+ * the data strip never rotates — it is the page's heartbeat.
+ */
 export function PromoCarousel({
   status,
   roundId,
@@ -81,29 +87,21 @@ export function PromoCarousel({
       body: roundLive
         ? `Round ${roundId.toString()} is ${phase === "betting" ? `taking bets for ${target !== null ? fmtCountdown(target, now) : "—"}` : "trading live"}. Three agents, one pool, zero house.`
         : "Three AI agents trade CTX live onchain. Back the winner with MON and split the pool.",
-      cta: { label: "Enter the Arena", href: "/arena", primary: true },
-      visual: true,
+      cta: { label: "Enter the Arena", href: "/arena", primary: false, external: false },
     },
     {
       key: "pari",
       kicker: null,
       title: "No house. No spread.",
       body: "Winners split the losing pool. Odds move with the crowd and every payout settles onchain.",
-      cta: { label: "How it works", href: "/#how", primary: false },
-      visual: false,
+      cta: { label: "How it works", href: "/#how", primary: false, external: false },
     },
     {
       key: "faucet",
       kicker: null,
       title: "Need testnet MON?",
       body: "The faucet drips free MON. Grab some and join the next round — it costs nothing but attention.",
-      cta: {
-        label: "Get MON",
-        href: "https://faucet.monad.xyz",
-        primary: false,
-        external: true,
-      },
-      visual: false,
+      cta: { label: "Get MON", href: "https://faucet.monad.xyz", primary: false, external: true },
     },
   ];
 
@@ -116,6 +114,8 @@ export function PromoCarousel({
     return () => clearInterval(id);
   }, [paused, reduce, slides.length]);
 
+  const s = slides[idx];
+
   return (
     <section
       aria-label="Highlights"
@@ -127,111 +127,115 @@ export function PromoCarousel({
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(60% 130% at 82% 18%, rgba(163,230,53,0.09), transparent 70%)",
+            "radial-gradient(60% 130% at 82% 12%, rgba(163,230,53,0.09), transparent 70%)",
         }}
         aria-hidden
       />
-      <div className="grid">
-        {slides.map((s, i) => (
-          <div
-            key={s.key}
-            className={`col-start-1 row-start-1 transition-opacity duration-200 ${
-              i === idx ? "opacity-100" : "pointer-events-none opacity-0"
-            }`}
-            aria-hidden={i !== idx}
-          >
-            <div className="grid grid-cols-1 gap-6 p-6 sm:p-8 md:grid-cols-[1.4fr_1fr] md:p-10">
-              <div className="flex max-w-[560px] flex-col justify-center">
-                {s.kicker && (
-                  <p className="tnum text-[11px] tracking-[0.22em] text-acid">
-                    {s.kicker}
-                  </p>
-                )}
-                <h1
-                  className={`font-display font-wide mt-3 text-4xl leading-[1.02] font-extrabold tracking-tight text-balance md:text-6xl ${
-                    s.key === "live" ? "" : "text-3xl md:text-5xl"
+
+      {/* Headline block (rotating) */}
+      <div className="grid grid-cols-1 gap-8 px-6 pt-10 pb-8 sm:px-10 md:pt-14">
+        <div className="max-w-[820px]">
+          {s.kicker && (
+            <p className="tnum text-[11px] tracking-[0.22em] text-acid">
+              {s.kicker}
+            </p>
+          )}
+          <h1 className="font-display font-wide mt-4 text-5xl leading-[0.98] font-extrabold tracking-tight text-balance md:text-7xl">
+            {s.title}
+          </h1>
+          <p className="mt-5 max-w-[52ch] text-[15px] leading-relaxed text-ash">
+            {s.body}
+          </p>
+          <div className="mt-7 flex flex-wrap items-center gap-3">
+            {s.cta.primary ? (
+              <Link
+                href={s.cta.href}
+                tabIndex={0}
+                className="focus-ring inline-flex h-12 items-center rounded-full bg-acid px-7 text-[15px] font-semibold whitespace-nowrap text-void transition hover:brightness-110 active:scale-[0.98]"
+              >
+                {s.cta.label}
+              </Link>
+            ) : s.cta.external ? (
+              <a
+                href={s.cta.href}
+                target="_blank"
+                rel="noreferrer"
+                tabIndex={0}
+                className="focus-ring tnum inline-flex h-12 items-center gap-2 rounded-full border hairline px-7 text-[14px] text-bone transition-colors hover:border-white/25"
+              >
+                {s.cta.label}
+                <ArrowSquareOut size={14} />
+              </a>
+            ) : (
+              <Link
+                href={s.cta.href}
+                tabIndex={0}
+                className="focus-ring inline-flex h-12 items-center rounded-full border hairline px-7 text-[14px] font-medium whitespace-nowrap text-bone transition-colors hover:border-white/25"
+              >
+                {s.cta.label}
+              </Link>
+            )}
+
+            <div className="flex gap-2 pl-1" role="tablist" aria-label="Slides">
+              {slides.map((sl, i) => (
+                <button
+                  key={sl.key}
+                  onClick={() => setIdx(i)}
+                  role="tab"
+                  aria-selected={i === idx}
+                  aria-label={`Go to slide ${i + 1}`}
+                  className={`h-1 rounded-full transition-all duration-200 ${
+                    i === idx ? "w-8 bg-bone" : "w-4 bg-white/15 hover:bg-white/30"
                   }`}
-                >
-                  {s.title}
-                </h1>
-                <p className="mt-4 max-w-[46ch] text-[14px] leading-relaxed text-ash">
-                  {s.body}
-                </p>
-                <div className="mt-6">
-                  {s.cta.primary ? (
-                    <Link
-                      href={s.cta.href}
-                      tabIndex={i === idx ? 0 : -1}
-                      className="inline-flex h-11 items-center rounded-full bg-acid px-6 text-[14px] font-semibold whitespace-nowrap text-void transition hover:brightness-110 active:scale-[0.98]"
-                    >
-                      {s.cta.label}
-                    </Link>
-                  ) : s.cta.external ? (
-                    <a
-                      href={s.cta.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      tabIndex={i === idx ? 0 : -1}
-                      className="tnum inline-flex h-11 items-center gap-2 rounded-full border hairline px-6 text-[13px] text-bone transition-colors hover:border-white/25"
-                    >
-                      {s.cta.label}
-                      <ArrowSquareOut size={14} />
-                    </a>
-                  ) : (
-                    <Link
-                      href={s.cta.href}
-                      tabIndex={i === idx ? 0 : -1}
-                      className="inline-flex h-11 items-center rounded-full border hairline px-6 text-[14px] font-medium whitespace-nowrap text-bone transition-colors hover:border-white/25"
-                    >
-                      {s.cta.label}
-                    </Link>
-                  )}
-                </div>
-              </div>
-              <div className="hidden flex-col justify-center md:flex">
-                {s.visual ? (
-                  <div className="rounded-2xl border hairline bg-obsidian/70 p-5">
-                    <p className="tnum text-[10px] tracking-[0.2em] text-faint">
-                      CTX / MON
-                    </p>
-                    <p className="tnum mt-1 text-[28px] font-semibold text-bone">
-                      {price > 0n ? fmtMon(price, 4) : "—"}
-                    </p>
-                    <div className="mt-2">
-                      <Sparkline points={priceHistory} />
-                    </div>
-                    <div className="tnum mt-3 flex justify-between border-t hairline pt-3 text-[11px] text-ash">
-                      <span>
-                        POOL{" "}
-                        <span className="text-bone">
-                          {round ? fmtMon(round.betPool, 2) : "—"}
-                        </span>
-                      </span>
-                      <span>
-                        ROUND{" "}
-                        <span className="text-bone">
-                          {roundId !== null ? roundId.toString() : "—"}
-                        </span>
-                      </span>
-                    </div>
-                  </div>
-                ) : null}
-              </div>
+                />
+              ))}
             </div>
           </div>
-        ))}
+        </div>
       </div>
-      <div className="absolute bottom-5 left-6 flex gap-2 sm:left-8 md:left-10">
-        {slides.map((s, i) => (
-          <button
-            key={s.key}
-            onClick={() => setIdx(i)}
-            aria-label={`Go to slide ${i + 1}`}
-            className={`h-1 rounded-full transition-all duration-200 ${
-              i === idx ? "w-8 bg-bone" : "w-4 bg-white/15 hover:bg-white/30"
-            }`}
-          />
-        ))}
+
+      {/* Live market strip: full-width, never rotates */}
+      <div className="tnum grid grid-cols-2 divide-x divide-white/[0.08] border-t hairline text-[12px] md:grid-cols-4">
+        <div className="px-5 py-4">
+          <div className="text-[10px] tracking-[0.16em] text-faint">
+            CTX / MON
+          </div>
+          <div className="mt-1 text-xl font-semibold text-bone md:text-2xl">
+            {price > 0n ? fmtMon(price, 4) : "—"}
+          </div>
+          <div className="mt-1.5 max-w-[160px]">
+            <Sparkline points={priceHistory} />
+          </div>
+        </div>
+        <div className="px-5 py-4">
+          <div className="text-[10px] tracking-[0.16em] text-faint">ROUND</div>
+          <div className="mt-1 text-xl font-semibold text-bone md:text-2xl">
+            {roundId !== null ? `#${roundId.toString()}` : "—"}
+          </div>
+          <div className="mt-1.5 text-[11px] text-ash">
+            {roundLive ? (phase === "betting" ? "BETTING OPEN" : "TRADING") : "IDLE"}
+          </div>
+        </div>
+        <div className="px-5 py-4">
+          <div className="text-[10px] tracking-[0.16em] text-faint">
+            {phase === "betting" ? "BETTING CLOSES" : "ROUND ENDS"}
+          </div>
+          <div className="mt-1 text-xl font-semibold text-bone md:text-2xl">
+            {target !== null ? fmtCountdown(target, now) : "—"}
+          </div>
+          <div className="mt-1.5 text-[11px] text-ash">
+            {phase === "settling" ? "SETTLING…" : "10-MIN ROUNDS"}
+          </div>
+        </div>
+        <div className="px-5 py-4">
+          <div className="text-[10px] tracking-[0.16em] text-faint">
+            BET POOL
+          </div>
+          <div className="mt-1 text-xl font-semibold text-acid md:text-2xl">
+            {round ? fmtMon(round.betPool, 2) : "—"}
+          </div>
+          <div className="mt-1.5 text-[11px] text-ash">MON · PARIMUTUEL</div>
+        </div>
       </div>
     </section>
   );
