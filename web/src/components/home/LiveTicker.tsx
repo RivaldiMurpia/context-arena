@@ -34,14 +34,14 @@ export function LiveTicker({ status, roundId, hasActive, price, round, now }: Pr
             : "IDLE";
 
   return (
-    <div className="tnum flex items-center gap-5 overflow-x-auto border-b hairline py-2.5 text-[11px] whitespace-nowrap text-ash sm:gap-7">
-      <span className="flex items-center gap-2 text-bone">
+    <div className="tnum flex items-center gap-5 overflow-x-auto border-b hairline py-2 text-[11px] whitespace-nowrap text-ash sm:gap-7">
+      <span className="flex items-center gap-2 text-acid">
         <span
           className={`live-dot inline-block h-1.5 w-1.5 rounded-full ${
             status === "live" && hasActive ? "bg-acid" : "bg-faint"
           }`}
         />
-        {status === "live" && hasActive ? "LIVE" : phaseLabel}
+        {status === "live" && hasActive ? "ON AIR" : phaseLabel}
       </span>
       <span>
         ROUND{" "}

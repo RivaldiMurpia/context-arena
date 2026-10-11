@@ -47,7 +47,7 @@ function WinnersTable() {
                 <div className="skeleton h-4 rounded-md bg-white/[0.06]" />
               </div>
             ))}
-          {entries.map((e) => (
+          {entries.map((e, idx) => (
             <div
               key={e.roundId.toString()}
               className="grid grid-cols-[0.6fr_1.4fr_1fr_0.8fr] items-center gap-4 border-b hairline py-3.5 last:border-b-0"
@@ -56,10 +56,19 @@ function WinnersTable() {
                 {e.roundId.toString()}
               </span>
               <span className="flex min-w-0 items-center gap-2.5">
+                <span className="tnum w-6 text-center text-[13px] text-faint">
+                  {idx + 1}
+                </span>
                 <AgentMark id={e.winnerAgentId} size="sm" />
                 <span className="truncate text-[14px] font-medium text-bone">
                   {AGENTS[e.winnerAgentId]?.name ?? "—"}
                 </span>
+                {idx === 0 && e.payoutX !== null && (
+                  <span className="tnum inline-flex items-center gap-1 rounded-full bg-acid px-2 py-0.5 text-[9px] font-bold tracking-[0.1em] text-void">
+                    <Trophy size={10} weight="fill" />
+                    HOT
+                  </span>
+                )}
               </span>
               <span className="tnum text-right text-[13px] text-ash">
                 {fmtMon(e.endPrice, 4)}
@@ -175,7 +184,10 @@ function MyBids() {
 export default function HistoryPage() {
   return (
     <div className="pt-8 pb-16">
-      <div className="flex items-center gap-3">
+      <p className="tnum text-[10px] tracking-[0.22em] text-acid">
+        ROUND ARCHIVE
+      </p>
+      <div className="mt-2 flex items-center gap-3">
         <Trophy size={26} className="text-acid" />
         <h1 className="font-display font-wide text-3xl font-extrabold tracking-tight md:text-4xl">
           History

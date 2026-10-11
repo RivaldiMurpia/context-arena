@@ -40,7 +40,7 @@ function NavBody({ onNavigate }: { onNavigate?: () => void }) {
           alt="Context Arena"
           width={1869}
           height={177}
-          className="h-auto w-[200px]"
+          className="h-auto w-[150px]"
           priority
         />
       </Link>

@@ -15,7 +15,7 @@ export function TopBar() {
 
   return (
     <header className="sticky top-0 z-30 border-b hairline bg-void/85 backdrop-blur-md">
-      <div className="flex h-[68px] items-center gap-3 px-4 md:px-6">
+      <div className="flex h-14 items-center gap-3 px-4 md:px-6">
         <button
           onClick={() => setDrawer(true)}
           className="rounded-full p-2 text-ash transition-colors hover:text-bone lg:hidden"

@@ -62,7 +62,7 @@ function useBetStats() {
 function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div className="rounded-2xl border hairline bg-panel p-4">
-      <p className="text-[12px] text-faint">{label}</p>
+      <p className="text-[10px] tracking-[0.14em] uppercase text-faint">{label}</p>
       <p className="tnum mt-1.5 text-[19px] font-semibold tracking-tight text-bone">
         {value}
         {sub && (
@@ -266,7 +266,7 @@ export default function ProfilePage() {
           ) : profile ? (
             <>
               <div className="flex flex-wrap items-center gap-2.5">
-                <h1 className="font-display text-[24px] font-extrabold tracking-tight">
+                <h1 className="font-display font-wide text-[28px] font-extrabold tracking-tight md:text-[32px]">
                   {profile.username}
                 </h1>
                 {changesLeft === 0 && (
@@ -289,7 +289,7 @@ export default function ProfilePage() {
             !unavailable && (
               <div className="flex flex-wrap items-center gap-3">
                 <div>
-                  <p className="font-display text-[20px] font-extrabold tracking-tight">
+                  <p className="font-display font-wide text-[24px] font-extrabold tracking-tight md:text-[28px]">
                     Claim your username
                   </p>
                   <p className="tnum mt-1 text-[13px] text-faint">

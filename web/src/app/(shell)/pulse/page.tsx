@@ -236,7 +236,10 @@ export default function PulsePage() {
 
   return (
     <div className="pt-8 pb-16">
-      <div className="flex flex-wrap items-center gap-3">
+      <p className="tnum text-[10px] tracking-[0.22em] text-acid">
+        ONCHAIN ANALYTICS
+      </p>
+      <div className="mt-2 flex flex-wrap items-center gap-3">
         <PulseIcon size={26} className="text-acid" />
         <h1 className="font-display font-wide text-3xl font-extrabold tracking-tight md:text-4xl">
           Pulse
