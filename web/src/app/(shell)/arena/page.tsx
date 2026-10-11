@@ -50,22 +50,27 @@ function ArenaPageHeader({
 
       {round && !round.settled && (
         <div className="tnum ml-auto flex flex-wrap items-center gap-x-5 gap-y-1 text-[12px]">
-          <span>
-            <span className="text-faint">BETTING&nbsp;</span>
-            <span className={phase === "betting" ? "text-bone" : "text-faint"}>
-              {phase === "betting"
-                ? fmtCountdown(Number(round.bettingCloseTime), now)
-                : "closed"}
+          {/* Single countdown source for the page. Label follows the phase:
+              BETTING CLOSES while betting is open, ROUND ENDS afterwards;
+              hidden while settling (the phase pill says SETTLING…). */}
+          {phase !== "settling" && (
+            <span>
+              <span className="text-faint">
+                {phase === "betting" ? "BETTING CLOSES" : "ROUND ENDS"}
+                &nbsp;
+              </span>
+              <span className="text-bone">
+                {fmtCountdown(
+                  Number(
+                    phase === "betting"
+                      ? round.bettingCloseTime
+                      : round.endTime
+                  ),
+                  now
+                )}
+              </span>
             </span>
-          </span>
-          <span>
-            <span className="text-faint">ENDS&nbsp;</span>
-            <span className="text-bone">
-              {phase === "settling"
-                ? "SETTLING…"
-                : fmtCountdown(Number(round.endTime), now)}
-            </span>
-          </span>
+          )}
           <span>
             <span className="text-faint">POOL&nbsp;</span>
             <span className="text-acid">{fmtMon(round.betPool)} MON</span>

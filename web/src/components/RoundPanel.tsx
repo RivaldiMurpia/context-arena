@@ -3,7 +3,6 @@
 import { Trophy } from "@phosphor-icons/react";
 import type { RoundInfo } from "@/lib/arena";
 import { AGENTS, fmtMon } from "@/lib/chain";
-import { fmtCountdown, phaseOf } from "@/hooks/useArena";
 import { PhasePill } from "./PhasePill";
 
 export function RoundPanel({
@@ -17,8 +16,6 @@ export function RoundPanel({
   hasActive: boolean;
   now: number;
 }) {
-  const phase = phaseOf(round, hasActive, now);
-
   return (
     <aside className="flex flex-col rounded-2xl border hairline bg-panel p-5">
       <div className="flex items-center justify-between">
@@ -32,22 +29,8 @@ export function RoundPanel({
 
       {round && !round.settled && (
         <div className="tnum mt-5 space-y-3 text-[13px]">
-          <div className="flex items-baseline justify-between border-b hairline pb-3">
-            <span className="text-[10px] tracking-[0.14em] text-faint">BETTING CLOSES</span>
-            <span className="text-lg text-bone">
-              {phase === "betting"
-                ? fmtCountdown(Number(round.bettingCloseTime), now)
-                : "closed"}
-            </span>
-          </div>
-          <div className="flex items-baseline justify-between border-b hairline pb-3">
-            <span className="text-[10px] tracking-[0.14em] text-faint">ROUND ENDS</span>
-            <span className="text-lg text-bone">
-              {phase === "settling"
-                ? "SETTLING…"
-                : fmtCountdown(Number(round.endTime), now)}
-            </span>
-          </div>
+          {/* Phase + countdown live in the page header; this panel keeps
+              only the pool so the two never show competing numbers. */}
           <div className="flex items-baseline justify-between">
             <span className="text-[10px] tracking-[0.14em] text-faint">BET POOL</span>
             <span className="text-lg text-acid">{fmtMon(round.betPool)} MON</span>
