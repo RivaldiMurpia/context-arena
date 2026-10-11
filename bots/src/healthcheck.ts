@@ -116,7 +116,7 @@ async function main() {
 
   if (roundCount > state.lastRound) {
     console.log(
-      `watchdog: ok — round #${roundCount - 1} done, round #${roundCount} live`
+      `watchdog: ok — round #${roundCount - 1} live (roundCount: ${roundCount})`
     );
     saveState({ lastRound: roundCount, lastProgress: now });
     return;
