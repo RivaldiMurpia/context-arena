@@ -126,7 +126,7 @@ function MyBids() {
           </div>
           <button
             onClick={openWallet}
-            className="inline-flex h-11 items-center gap-2 rounded-full bg-acid px-6 text-[14px] font-semibold whitespace-nowrap text-void transition hover:brightness-110 active:scale-[0.98]"
+            className="focus-ring inline-flex h-11 items-center gap-2 rounded-full bg-acid px-6 text-[14px] font-semibold whitespace-nowrap text-void transition hover:brightness-110 active:scale-[0.98]"
           >
             <Wallet size={16} weight="bold" />
             Connect Wallet

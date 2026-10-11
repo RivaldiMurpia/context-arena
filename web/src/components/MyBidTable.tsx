@@ -42,7 +42,7 @@ function ClaimButton({ bid }: { bid: MyBid }) {
           });
         }}
         disabled={isPending || mining}
-        className="tnum rounded-lg bg-acid px-3 py-1.5 text-[12px] font-semibold text-black transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50"
+        className="tnum focus-ring rounded-lg bg-acid px-3 py-1.5 text-[12px] font-semibold text-void transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50"
       >
         {isPending
           ? "Confirm in wallet…"
@@ -51,7 +51,7 @@ function ClaimButton({ bid }: { bid: MyBid }) {
             : label}
       </button>
       {error && (
-        <span className="tnum max-w-[180px] text-right text-[10px] text-red-400">
+        <span className="tnum max-w-[180px] text-right text-[10px] text-blood">
           Failed — retry
         </span>
       )}

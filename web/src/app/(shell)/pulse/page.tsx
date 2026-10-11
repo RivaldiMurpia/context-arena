@@ -45,7 +45,7 @@ function AgentStrip({ data }: { data: PulseData }) {
       <p className="tnum text-[10px] tracking-[0.18em] text-faint">
         AGENT PERFORMANCE · ALL TIME
       </p>
-      <div className="mt-3 grid grid-cols-1 divide-y hairline border-y hairline sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+      <div className="mt-3 grid grid-cols-1 divide-y divide-white/[0.08] border-y hairline sm:grid-cols-3 sm:divide-x sm:divide-y-0">
         {data.agents.map((a) => {
           const meta = AGENTS[a.id];
           // prefer the client-side recount; the indexer aggregate undercounts

@@ -85,7 +85,7 @@ function NavBody({ onNavigate }: { onNavigate?: () => void }) {
           <Link
             href="/arena"
             onClick={onNavigate}
-            className="mt-3 inline-flex w-full items-center justify-center rounded-full bg-acid px-4 py-2 text-[13px] font-semibold text-void transition hover:brightness-110 active:scale-[0.98]"
+            className="focus-ring mt-3 inline-flex w-full items-center justify-center rounded-full bg-acid px-4 py-2 text-[13px] font-semibold text-void transition hover:brightness-110 active:scale-[0.98]"
           >
             Watch the arena
           </Link>

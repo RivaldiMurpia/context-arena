@@ -33,7 +33,7 @@ export function RoundHistory({ roundCount }: { roundCount: bigint }) {
 
   return (
     <section>
-      <h2 className="font-display text-lg font-semibold tracking-tight">
+      <h2 className="font-display text-[20px] font-bold tracking-tight">
         Past rounds
       </h2>
       <div className="mt-2 border-t hairline">

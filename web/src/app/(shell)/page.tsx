@@ -35,11 +35,20 @@ export default function HomePage() {
       />
 
       {a.status === "loading" && !hasData && (
-        <div className="flex items-center gap-3 py-24">
-          <span className="live-dot inline-block h-2 w-2 rounded-full bg-acid" />
-          <span className="tnum text-[13px] text-ash">
+        <div aria-hidden className="pt-5">
+          <div className="skeleton h-[220px] rounded-2xl bg-white/[0.04]" />
+          <div className="mt-10 grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-[2fr_1fr]">
+            <div className="space-y-3">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="skeleton h-14 rounded-xl bg-white/[0.04]" />
+              ))}
+            </div>
+            <div className="skeleton h-[220px] rounded-2xl bg-white/[0.04]" />
+          </div>
+          <p className="tnum mt-8 flex items-center gap-3 text-[13px] text-ash">
+            <span className="live-dot inline-block h-2 w-2 rounded-full bg-acid" />
             connecting to Monad testnet…
-          </span>
+          </p>
         </div>
       )}
 

@@ -1,7 +1,7 @@
 "use client";
 
 import type { AgentState, FeedItem } from "@/lib/arena";
-import { AGENTS, fmtMon } from "@/lib/chain";
+import { AGENTS, fmtMon, fmtSigned } from "@/lib/chain";
 import { AgentMark } from "./home/AgentMark";
 
 type TradeItem = Extract<FeedItem, { kind: "trade" }>;
@@ -69,6 +69,10 @@ function AgentRow({
         <div className="text-[10px] tracking-[0.14em] text-faint">POSITION</div>
         <div className="mt-1.5 h-[3px] w-36 overflow-hidden rounded-full bg-[rgba(255,255,255,0.08)]">
           <div className="h-full bg-acid" style={{ width: `${ctxPct}%` }} />
+          <div
+            className="h-full border-l border-white/25"
+            style={{ width: `${100 - ctxPct}%` }}
+          />
         </div>
         <div className="tnum mt-1 text-[10px] text-faint">
           {ctxPct}% CTX · {100 - ctxPct}% MON
@@ -83,8 +87,7 @@ function AgentRow({
         <div
           className={`tnum mt-0.5 text-[12px] ${pnlUp ? "text-acid" : "text-blood"}`}
         >
-          {pnlUp ? "+" : ""}
-          {fmtMon(a.pnl)}
+          {fmtSigned(a.pnl)}
         </div>
       </div>
     </div>
@@ -103,7 +106,7 @@ export function Leaderboard({
   winnerId: bigint | null;
 }) {
   const ranked = [...agents].sort((a, b) =>
-    a.portfolio > b.portfolio ? -1 : a.portfolio < b.portfolio ? 1 : 0
+    a.portfolio === b.portfolio ? (a.id < b.id ? -1 : 1) : a.portfolio > b.portfolio ? -1 : 1
   );
   return (
     <section>

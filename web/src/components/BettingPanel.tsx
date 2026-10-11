@@ -107,13 +107,19 @@ export function BettingPanel({
   const placeBet = () => {
     const v = parseFloat(amount);
     if (!Number.isFinite(v) || v <= 0) return;
+    let value: bigint;
+    try {
+      value = parseEther(amount); // rejects malformed input like "1.2.3"
+    } catch {
+      return; // payoutPreview already hides; never crash the panel
+    }
     reset();
     writeContract({
       address: ARENA_ADDRESS,
       abi: ABI,
       functionName: "placeBet",
       args: [BigInt(pick)],
-      value: parseEther(amount),
+      value,
     });
   };
 
@@ -153,7 +159,7 @@ export function BettingPanel({
               aria-checked={selected}
               onClick={() => setPick(a.id)}
               disabled={!bettingOpen}
-              className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-all duration-150 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-acid/70 ${
+              className={`focus-ring flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-all duration-150 active:scale-[0.99] ${
                 selected
                   ? "hairline-acid bg-[rgba(163,230,53,0.06)]"
                   : "hairline hover:border-[rgba(255,255,255,0.18)]"
@@ -182,7 +188,7 @@ export function BettingPanel({
                   {st && round ? odds(st.betsOn, round.betPool) : "—"}
                 </span>
                 <span className="block text-[10px] tracking-[0.1em] text-faint">
-                  PAYOUT
+                  ODDS
                 </span>
               </span>
             </button>
@@ -205,7 +211,7 @@ export function BettingPanel({
                 type="button"
                 onClick={() => setAmount(q)}
                 disabled={!bettingOpen}
-                className={`rounded-full border px-2.5 py-1 text-[11px] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-acid/70 disabled:opacity-40 ${
+                className={`focus-ring rounded-full border px-2.5 py-1 text-[11px] transition-colors duration-150 disabled:opacity-40 ${
                   amount === q
                     ? "hairline-acid text-acid"
                     : "hairline text-ash hover:text-bone"
@@ -216,7 +222,7 @@ export function BettingPanel({
             ))}
           </div>
         </div>
-        <div className="mt-1.5 flex items-center rounded-xl border hairline bg-void px-3 focus-within:hairline-acid">
+        <div className="mt-1.5 flex items-center rounded-xl border hairline bg-void px-3 transition-colors focus-within:border-[rgba(163,230,53,0.45)]">
           <input
             id="bet-amount"
             inputMode="decimal"
@@ -240,7 +246,7 @@ export function BettingPanel({
       {!isConnected ? (
         <button
           onClick={openWallet}
-          className="mt-4 w-full rounded-full bg-acid py-2.5 text-[14px] font-semibold text-void transition-all hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-acid/70"
+          className="focus-ring mt-4 w-full rounded-full bg-acid py-2.5 text-[14px] font-semibold text-void transition-all hover:brightness-110 active:scale-[0.98]"
         >
           Connect wallet to bet
         </button>
@@ -248,7 +254,7 @@ export function BettingPanel({
         <button
           onClick={placeBet}
           disabled={!bettingOpen || txPending}
-          className="mt-4 w-full rounded-full bg-acid py-2.5 text-[14px] font-semibold text-void transition-all hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-acid/70 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:brightness-100"
+          className="focus-ring mt-4 w-full rounded-full bg-acid py-2.5 text-[14px] font-semibold text-void transition-all hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:brightness-100"
         >
           {!bettingOpen
             ? "Betting closed"
@@ -291,7 +297,7 @@ export function BettingPanel({
         <button
           onClick={claim}
           disabled={txPending}
-          className="tnum mt-4 w-full rounded-full border hairline-acid py-2.5 text-[14px] font-semibold text-acid transition-all hover:bg-[rgba(163,230,53,0.08)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-acid/70"
+          className="focus-ring tnum mt-4 w-full rounded-full border hairline-acid py-2.5 text-[14px] font-semibold text-acid transition-all hover:bg-[rgba(163,230,53,0.08)] active:scale-[0.98]"
         >
           {txPending ? "Confirm in wallet…" : `Claim ${fmtMon(claimable)} MON`}
         </button>

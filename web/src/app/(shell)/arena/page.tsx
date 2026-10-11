@@ -13,6 +13,29 @@ import { RoundHistory } from "@/components/RoundHistory";
 import { HowItWorks } from "@/components/HowItWorks";
 import { WinFx } from "@/components/WinFx";
 
+/** First-paint skeleton matching the arena grid shape (no layout shift on load). */
+function ArenaSkeleton() {
+  return (
+    <div aria-hidden className="pt-6">
+      <div className="flex items-center gap-3">
+        <div className="skeleton h-3 w-3 rounded-full bg-white/[0.08]" />
+        <div className="skeleton h-6 w-40 rounded-lg bg-white/[0.06]" />
+        <div className="skeleton ml-auto h-6 w-48 rounded-lg bg-white/[0.06]" />
+      </div>
+      <div className="grid grid-cols-1 gap-x-6 gap-y-8 pt-5 lg:grid-cols-12">
+        <div className="skeleton h-[360px] rounded-2xl bg-white/[0.04] lg:col-span-8" />
+        <div className="skeleton h-[360px] rounded-2xl bg-white/[0.04] lg:col-span-4" />
+        <div className="skeleton h-[220px] rounded-2xl bg-white/[0.04] lg:col-span-8" />
+        <div className="skeleton h-[220px] rounded-2xl bg-white/[0.04] lg:col-span-4" />
+      </div>
+      <p className="tnum mt-6 flex items-center gap-3 text-[13px] text-ash">
+        <span className="live-dot inline-block h-2 w-2 rounded-full bg-acid" />
+        connecting to Monad testnet…
+      </p>
+    </div>
+  );
+}
+
 /**
  * Compact trading-terminal header: round identity + phase on the left,
  * the numbers that matter for a bettor on the right. The shell provides
@@ -96,14 +119,7 @@ export default function ArenaPage() {
 
   return (
     <>
-      {a.status === "loading" && !hasData && (
-        <div className="flex items-center gap-3 py-24">
-          <span className="live-dot inline-block h-2 w-2 rounded-full bg-acid" />
-          <span className="tnum text-[13px] text-ash">
-            connecting to Monad testnet…
-          </span>
-        </div>
-      )}
+      {a.status === "loading" && !hasData && <ArenaSkeleton />}
 
       {a.status === "error" && (
         <div className="mt-6 border border-[rgba(251,113,133,0.3)] bg-[rgba(251,113,133,0.06)] px-4 py-3 text-[13px] text-blood">

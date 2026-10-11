@@ -7,7 +7,7 @@ const PHASE_COPY: Record<string, { label: string; cls: string }> = {
   betting: { label: "BETTING OPEN", cls: "bg-acid text-void" },
   trading: { label: "TRADING", cls: "bg-elev text-bone" },
   settling: { label: "SETTLING…", cls: "bg-elev text-ash" },
-  settled: { label: "SETTLED", cls: "bg-elev text-ash" },
+  settled: { label: "SETTLED", cls: "bg-acid/10 text-acid" },
   idle: { label: "IDLE", cls: "bg-elev text-faint" },
 };
 

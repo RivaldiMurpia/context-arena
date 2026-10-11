@@ -47,12 +47,24 @@ body {
   letter-spacing: -0.01em;
 }
 
-.hairline {
+@utility hairline {
   border-color: rgb(255 255 255 / 0.12);
 }
 
-.hairline-acid {
+@utility hairline-acid {
   border-color: rgb(163 230 53 / 0.16);
+}
+
+/* Shared visible focus for interactive controls (replaces ring utilities).
+   Also makes focus-within:hairline-acid work — variants only compile for
+   @utility classes, plain classes silently generate nothing. */
+.focus-ring {
+  outline: none;
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid rgb(163 230 53 / 0.7);
+  outline-offset: 2px;
 }
 
 /* thin scrollbars for feed panels */

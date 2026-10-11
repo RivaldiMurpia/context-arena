@@ -130,7 +130,7 @@ function BioModal({ onClose }: { onClose: () => void }) {
           {normalizeBio(bio).length}/{BIO_MAX}
         </p>
         {(localError || error) && (
-          <p className="mt-2 text-[12px] text-red-400">{localError ?? error}</p>
+          <p className="mt-2 text-[12px] text-blood">{localError ?? error}</p>
         )}
         <button
           onClick={submit}
@@ -192,7 +192,7 @@ export default function ProfilePage() {
           </div>
           <button
             onClick={openWallet}
-            className="inline-flex h-11 items-center gap-2 rounded-full bg-acid px-6 text-[14px] font-semibold whitespace-nowrap text-void transition hover:brightness-110 active:scale-[0.98]"
+            className="focus-ring inline-flex h-11 items-center gap-2 rounded-full bg-acid px-6 text-[14px] font-semibold whitespace-nowrap text-void transition hover:brightness-110 active:scale-[0.98]"
           >
             Connect Wallet
           </button>
@@ -229,7 +229,7 @@ export default function ProfilePage() {
           className="relative h-[150px] sm:h-[180px]"
           style={{
             background:
-              "radial-gradient(120% 160% at 50% 120%, rgba(163,230,53,0.14) 0%, rgba(120,40,80,0.25) 45%, #0a0a0c 78%)",
+              "radial-gradient(120% 160% at 50% 120%, rgba(163,230,53,0.16) 0%, rgba(20,26,17,0.9) 55%, #0d110c 100%)",
           }}
         >
           <div className="absolute top-4 right-4 flex gap-2">
@@ -326,7 +326,7 @@ export default function ProfilePage() {
               <div>
                 <p className="text-[11px] tracking-[0.14em] text-faint">NET P/L</p>
                 <p
-                  className={`mt-1 text-[15px] font-semibold ${stats.net >= 0n ? "text-acid" : "text-red-400"}`}
+                  className={`mt-1 text-[15px] font-semibold ${stats.net >= 0n ? "text-acid" : "text-blood"}`}
                 >
                   {stats.net >= 0n ? "+" : "−"}
                   {fmtMon(stats.net >= 0n ? stats.net : -stats.net, 2)}
@@ -363,17 +363,10 @@ export default function ProfilePage() {
             <h2 className="font-display text-[20px] font-bold tracking-tight">
               Statistics
             </h2>
+            {/* Four canonical figures — WAGERED/WINS/RATE also live in the
+                header above, so repeating them here was noise. */}
             <div className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
               <StatCard label="Total Bets" value={String(stats.totalBets)} />
-              <StatCard label="Wins" value={String(stats.wins)} />
-              <StatCard
-                label="Win Rate"
-                value={
-                  stats.winRate === null
-                    ? "N/A"
-                    : `${(stats.winRate * 100).toFixed(1)}%`
-                }
-              />
               <StatCard
                 label="Total Wagered"
                 value={fmtMon(stats.wagered, 2)}
@@ -387,16 +380,6 @@ export default function ProfilePage() {
               <StatCard
                 label="Net P/L"
                 value={`${stats.net >= 0n ? "+" : "−"}${fmtMon(stats.net >= 0n ? stats.net : -stats.net, 2)}`}
-                sub="MON"
-              />
-              <StatCard
-                label="Best Win"
-                value={stats.best > 0n ? `+${fmtMon(stats.best, 2)}` : "—"}
-                sub={stats.best > 0n ? "MON" : undefined}
-              />
-              <StatCard
-                label="Avg Bet"
-                value={fmtMon(stats.avg, 2)}
                 sub="MON"
               />
             </div>

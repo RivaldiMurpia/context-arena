@@ -57,7 +57,7 @@ export function LiveTicker({ status, roundId, hasActive, price, round, now }: Pr
       </span>
       <span>
         {phaseLabel}{" "}
-        <span className="text-acid">
+        <span className="text-bone">
           {target !== null ? fmtCountdown(target, now) : "—"}
         </span>
       </span>

@@ -191,7 +191,7 @@ export function WinFx({
           <button
             onClick={() => setDismissed(roundId)}
             aria-label="Dismiss round result"
-            className="ml-auto rounded p-1 text-faint transition-colors hover:text-bone focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-acid/70"
+            className="focus-ring ml-auto rounded p-1 text-faint transition-colors hover:text-bone"
           >
             <X size={14} />
           </button>

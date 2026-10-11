@@ -105,7 +105,7 @@ export function ActivityFeed({ feed }: { feed: FeedItem[] }) {
   return (
     <section>
       <div className="flex items-baseline justify-between">
-        <h2 className="font-display text-lg font-semibold tracking-tight">
+        <h2 className="font-display text-[20px] font-bold tracking-tight">
           Activity
         </h2>
         <span className="tnum text-[11px] text-faint">ONCHAIN · NEWEST FIRST</span>

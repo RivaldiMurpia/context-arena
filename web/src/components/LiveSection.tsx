@@ -93,16 +93,16 @@ export function LiveSection({
         />
       </div>
 
-      <div className="tnum mt-3 grid grid-cols-3 gap-2 text-[12px]">
-        <div>
+      <div className="tnum mt-3 grid grid-cols-3 divide-x divide-white/[0.08] text-[12px]">
+        <div className="pr-4">
           <div className="text-[10px] tracking-[0.14em] text-faint">HIGH</div>
           <div className="mt-0.5 text-bone">{hi ? fmtMon(hi) : "—"}</div>
         </div>
-        <div>
+        <div className="px-4">
           <div className="text-[10px] tracking-[0.14em] text-faint">LOW</div>
           <div className="mt-0.5 text-bone">{lo ? fmtMon(lo) : "—"}</div>
         </div>
-        <div>
+        <div className="pl-4">
           <div className="text-[10px] tracking-[0.14em] text-faint">AGENT TRADES</div>
           <div className="mt-0.5 text-bone">{roundTrades}</div>
         </div>

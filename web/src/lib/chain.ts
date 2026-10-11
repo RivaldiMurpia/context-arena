@@ -58,6 +58,11 @@ export function fmtMon(w: bigint, dp = 4): string {
   return `${neg ? "-" : ""}${int.toString()}.${frac}`;
 }
 
+/** Signed MON figure for PnL-style values — always carries + or -. */
+export function fmtSigned(w: bigint, dp = 4): string {
+  return `${w < 0n ? "-" : "+"}${fmtMon(w < 0n ? -w : w, dp)}`;
+}
+
 export function fmtInt(n: bigint | number): string {
   return Number(n).toLocaleString("en-US");
 }
