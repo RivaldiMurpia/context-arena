@@ -24,6 +24,10 @@ const STATE_FILE = `${STATE_DIR}/watchdog.json`;
 // No new round for this long => stall. Normal rounds are 10 min;
 // 30 min gives the master room for RPC hiccups.
 const STALL_MS = Number(process.env.WATCHDOG_STALL_MS ?? 30 * 60_000);
+// Settle tx lands 10-30s after endTime. That lag is the normal SETTLING
+// phase (the web UI shows "SETTLING…"), not a stall — grace before
+// declaring the round dead. Env-overridable for testing.
+const SETTLE_GRACE_S = Number(process.env.WATCHDOG_SETTLE_GRACE_S ?? 120);
 const SERVICES = [
   "context-arena-master",
   "context-arena-agent-0",
@@ -138,6 +142,12 @@ async function main() {
       const nowS = Math.floor(now / 1000);
       if (!settled && nowS < endTime) {
         detail = `round #${roundCount - 1} active, ${endTime - nowS}s left`;
+        saveState({ ...state, lastProgress: now });
+      } else if (!settled && nowS < endTime + SETTLE_GRACE_S) {
+        // now past endTime but settle tx hasn't landed yet = normal
+        // SETTLING phase (pre-fix this fired ~8 false STALL restarts/day
+        // with "ended 0m ago").
+        detail = `round #${roundCount - 1} settling, ${nowS - endTime}s past end`;
         saveState({ ...state, lastProgress: now });
       } else if (settled && nowS < endTime + STALL_MS / 1000) {
         detail = `round #${roundCount - 1} settled, next starting soon`;
