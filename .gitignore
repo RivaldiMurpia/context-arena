@@ -16,3 +16,4 @@ dist/
 # opencode (local agent config, never commit)
 .opencode/
 opencode.json
+.vercel
